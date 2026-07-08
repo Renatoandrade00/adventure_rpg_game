@@ -54,6 +54,11 @@ export default class MapEastScene extends Phaser.Scene {
     this.player.setDisplaySize(48, 48);
     this.player.setCollideWorldBounds(true);
 
+    const tw = this.player.width;
+    const th = this.player.height;
+    (this.player.body as Phaser.Physics.Arcade.Body).setSize(tw * 0.4, th * 0.5);
+    (this.player.body as Phaser.Physics.Arcade.Body).setOffset(tw * 0.3, th * 0.25);
+
     if (worldLayer) {
       this.physics.add.collider(this.player, worldLayer);
     }
@@ -106,6 +111,11 @@ export default class MapEastScene extends Phaser.Scene {
         enemy.setDisplaySize(48, 48);
         enemy.setCollideWorldBounds(true);
         enemy.setBounce(1); 
+        
+        const ew = enemy.width;
+        const eh = enemy.height;
+        (enemy.body as Phaser.Physics.Arcade.Body).setSize(ew * 0.5, eh * 0.5);
+        (enemy.body as Phaser.Physics.Arcade.Body).setOffset(ew * 0.25, eh * 0.25);
         
         if (Math.random() > 0.3) {
             enemy.setVelocity(Phaser.Math.Between(-50, 50) || 30, Phaser.Math.Between(-50, 50) || 30);

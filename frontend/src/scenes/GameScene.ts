@@ -61,6 +61,12 @@ export default class GameScene extends Phaser.Scene {
     this.player.setDisplaySize(48, 48); // Tamanho aumentado do personagem
     this.player.setCollideWorldBounds(true);
 
+    // Diminui a caixa de colisão invisível (Hitbox) do jogador
+    const tw = this.player.width;
+    const th = this.player.height;
+    (this.player.body as Phaser.Physics.Arcade.Body).setSize(tw * 0.4, th * 0.5);
+    (this.player.body as Phaser.Physics.Arcade.Body).setOffset(tw * 0.3, th * 0.25);
+
     if (worldLayer) {
       this.physics.add.collider(this.player, worldLayer);
     }
@@ -88,6 +94,12 @@ export default class GameScene extends Phaser.Scene {
         slime.setDisplaySize(32, 32);
         slime.setCollideWorldBounds(true);
         slime.setBounce(1); // Faz o slime quicar suavemente nas paredes se ele estiver se movendo
+
+        // Hitbox menor pro slime também
+        const sw = slime.width;
+        const sh = slime.height;
+        (slime.body as Phaser.Physics.Arcade.Body).setSize(sw * 0.5, sh * 0.5);
+        (slime.body as Phaser.Physics.Arcade.Body).setOffset(sw * 0.25, sh * 0.25);
         
         // Define se este slime andará ou ficará parado
         const isMoving = Math.random() > 0.5;

@@ -53,6 +53,11 @@ export default class MapSouthScene extends Phaser.Scene {
     this.player.setDisplaySize(48, 48);
     this.player.setCollideWorldBounds(true);
 
+    const tw = this.player.width;
+    const th = this.player.height;
+    (this.player.body as Phaser.Physics.Arcade.Body).setSize(tw * 0.4, th * 0.5);
+    (this.player.body as Phaser.Physics.Arcade.Body).setOffset(tw * 0.3, th * 0.25);
+
     if (worldLayer) {
       this.physics.add.collider(this.player, worldLayer);
     }
@@ -102,6 +107,11 @@ export default class MapSouthScene extends Phaser.Scene {
         enemy.setCollideWorldBounds(true);
         enemy.setBounce(1); 
         
+        const ew = enemy.width;
+        const eh = enemy.height;
+        (enemy.body as Phaser.Physics.Arcade.Body).setSize(ew * 0.5, eh * 0.5);
+        (enemy.body as Phaser.Physics.Arcade.Body).setOffset(ew * 0.25, eh * 0.25);
+        
         if (Math.random() > 0.3) {
             enemy.setVelocity(Phaser.Math.Between(-60, 60) || 40, Phaser.Math.Between(-60, 60) || 40);
         }
@@ -115,6 +125,11 @@ export default class MapSouthScene extends Phaser.Scene {
     dragon.setCollideWorldBounds(true);
     dragon.setVelocity(30, 30);
     dragon.setBounce(1);
+    
+    const dw = dragon.width;
+    const dh = dragon.height;
+    (dragon.body as Phaser.Physics.Arcade.Body).setSize(dw * 0.6, dh * 0.6);
+    (dragon.body as Phaser.Physics.Arcade.Body).setOffset(dw * 0.2, dh * 0.2);
 
     if (worldLayer) {
         this.physics.add.collider(this.enemies, worldLayer);
