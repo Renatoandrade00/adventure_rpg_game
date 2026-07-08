@@ -140,9 +140,9 @@ export default class GameScene extends Phaser.Scene {
     // 6. Retorno da Batalha
     this.events.on('resume', (_scene: any, data: any) => {
         if (data && data.result === 'win') {
-            // Destrói o slime derrotado
-            if (data.slime) {
-                data.slime.destroy();
+            // Destrói o inimigo derrotado
+            if (data.enemy) {
+                data.enemy.destroy();
             }
         }
         

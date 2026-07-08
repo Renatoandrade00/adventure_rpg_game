@@ -255,18 +255,12 @@ export default class BattleScene extends Phaser.Scene {
     this.registry.set('user', this.userData);
 
     this.time.delayedCall(3000, () => {
-      this.scene.stop();
-      // O parent precisa recuperar a cena baseada na qual estava ativa (GameScene, MapEastScene, etc)
-      // Mas para simplificar, paramos essa e as cenas abaixo escutam o 'resume' global
-    });
-    
-    // Dispara um evento global de vitória
-    this.time.delayedCall(2900, () => {
-        this.scene.manager.getScenes(true).forEach(s => {
-            if (s.scene.key !== 'BattleScene') {
-                s.events.emit('resume', s, { result: 'win', enemy: this.enemyData });
+        this.scene.manager.getScenes(false).forEach(s => {
+            if (this.scene.manager.isPaused(s.scene.key)) {
+                this.scene.resume(s.scene.key, { result: 'win', enemy: this.enemyData });
             }
         });
+        this.scene.stop();
     });
   }
 
@@ -276,13 +270,12 @@ export default class BattleScene extends Phaser.Scene {
     this.logsText.setText(`Você desmaiou... \n(Acordou no início da jornada)`);
     
     this.time.delayedCall(3000, () => {
-        this.scene.stop();
-        // Volta direto para a GameScene
-        this.scene.manager.getScenes(true).forEach(s => {
-            if (s.scene.key !== 'BattleScene') {
-                s.scene.stop();
+        this.scene.manager.getScenes(false).forEach(s => {
+            if (this.scene.manager.isPaused(s.scene.key)) {
+                this.scene.stop(s.scene.key); // Para a cena atual que estava pausada
             }
         });
+        this.scene.stop();
         this.scene.start('GameScene', { x: 160, y: 160 });
     });
   }
@@ -296,12 +289,12 @@ export default class BattleScene extends Phaser.Scene {
         this.logsText.setText("Você fugiu com sucesso!");
         
         this.time.delayedCall(1500, () => {
-            this.scene.stop();
-            this.scene.manager.getScenes(true).forEach(s => {
-                if (s.scene.key !== 'BattleScene') {
-                    s.events.emit('resume', s, { result: 'flee' });
+            this.scene.manager.getScenes(false).forEach(s => {
+                if (this.scene.manager.isPaused(s.scene.key)) {
+                    this.scene.resume(s.scene.key, { result: 'flee' });
                 }
             });
+            this.scene.stop();
         });
     } else {
         this.logsText.setText("Você tentou fugir, mas tropeçou!");
