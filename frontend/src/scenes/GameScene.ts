@@ -94,7 +94,7 @@ export default class GameScene extends Phaser.Scene {
     }
 
     // Tratamento ao voltar da batalha ou do menu
-    this.events.on('resume', (sys: any, data: any) => {
+    this.events.on('resume', (_sys: any, data: any) => {
         if (data && data.menuUpdate) {
             this.userData = this.registry.get('user');
             this.hudText.setText(`${this.userData.username} [${this.userData.characterClass}] - Lvl: ${this.userData.level} | Exp: ${this.userData.exp} | Ouro: ${this.userData.gold} | HP: ${this.userData.hp}/${this.userData.maxHp}`);
