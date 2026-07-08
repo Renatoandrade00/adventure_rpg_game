@@ -17,7 +17,31 @@ export default class ShopScene extends Phaser.Scene {
   }
 
   create() {
-    this.cameras.main.setBackgroundColor('#d35400'); // Fundo laranja rústico para loja
+    // Criação do Mapa Interior
+    const level = [];
+    for (let y = 0; y < 19; y++) {
+      const row = [];
+      for (let x = 0; x < 25; x++) {
+        if (y === 0 || y === 18 || x === 0 || x === 24) {
+          row.push(6); // Parede Tijolo
+        } else if (y === 7 && x > 8 && x < 16) {
+          row.push(7); // Balcão
+        } else {
+          row.push(5); // Chão Madeira
+        }
+      }
+      level.push(row);
+    }
+    const map = this.make.tilemap({ data: level, tileWidth: 32, tileHeight: 32 });
+    const tileset = map.addTilesetImage('tiles', 'tiles', 32, 32, 0, 0);
+    
+    let worldLayer: any = null;
+    if (tileset) {
+      worldLayer = map.createLayer(0, tileset, 0, 0);
+      if (worldLayer) {
+        worldLayer.setCollision([6, 7]); // Parede e Balcão colidem
+      }
+    }
 
     // Título
     this.add.text(this.cameras.main.centerX, 40, 'LOJA DE ITENS', { fontSize: '28px', color: '#f1c40f', fontStyle: 'bold' }).setOrigin(0.5);
@@ -45,6 +69,10 @@ export default class ShopScene extends Phaser.Scene {
 
     if (this.input.keyboard) {
         this.cursors = this.input.keyboard.createCursorKeys();
+    }
+
+    if (worldLayer) {
+        this.physics.add.collider(this.player, worldLayer);
     }
 
     // Colisão Saída

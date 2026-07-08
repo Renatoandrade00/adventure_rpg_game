@@ -44,8 +44,45 @@ export default class BootScene extends Phaser.Scene {
     graphics.fillStyle(0x271613, 1); // Detalhes
     graphics.fillRect(128 + 6, 6, 4, 4);
     graphics.fillRect(128 + 22, 18, 4, 4);
+
+    // Tile 5: Chão de Madeira (Interior)
+    graphics.fillStyle(0x8D6E63, 1);
+    graphics.fillRect(160, 0, 32, 32);
+    graphics.lineStyle(1, 0x5D4037, 1);
+    graphics.beginPath();
+    graphics.moveTo(160, 8); graphics.lineTo(192, 8);
+    graphics.moveTo(160, 16); graphics.lineTo(192, 16);
+    graphics.moveTo(160, 24); graphics.lineTo(192, 24);
+    graphics.strokePath();
+
+    // Tile 6: Parede de Tijolos (Interior)
+    graphics.fillStyle(0xB71C1C, 1); // Vermelho tijolo
+    graphics.fillRect(192, 0, 32, 32);
+    graphics.lineStyle(2, 0xffffff, 0.5); // Linhas brancas de cimento
+    graphics.beginPath();
+    graphics.moveTo(192, 10); graphics.lineTo(224, 10);
+    graphics.moveTo(192, 22); graphics.lineTo(224, 22);
+    graphics.moveTo(208, 0); graphics.lineTo(208, 10);
+    graphics.moveTo(200, 10); graphics.lineTo(200, 22);
+    graphics.moveTo(216, 22); graphics.lineTo(216, 32);
+    graphics.strokePath();
+
+    // Tile 7: Balcão de Loja
+    graphics.fillStyle(0x795548, 1);
+    graphics.fillRect(224, 0, 32, 32);
+    graphics.fillStyle(0x5D4037, 1);
+    graphics.fillRect(224, 10, 32, 12); // Tampo
     
-    graphics.generateTexture('tiles', 160, 32);
+    // Tile 8: Cama de Hospital
+    graphics.fillStyle(0xEEEEEE, 1); // Lençol branco
+    graphics.fillRect(256, 0, 32, 32);
+    graphics.fillStyle(0x64B5F6, 1); // Travesseiro azul claro
+    graphics.fillRect(256 + 4, 4, 24, 8);
+    graphics.fillStyle(0xFF5252, 1); // Cruz vermelha minúscula
+    graphics.fillRect(256 + 14, 18, 4, 10);
+    graphics.fillRect(256 + 11, 21, 10, 4);
+
+    graphics.generateTexture('tiles', 288, 32);
     graphics.destroy();
 
     // ==========================================
