@@ -47,7 +47,7 @@ export default class GameScene extends Phaser.Scene {
     if (tileset) {
       worldLayer = map.createLayer(0, tileset, 0, 0);
       if (worldLayer) {
-        worldLayer.setCollision(1);
+        worldLayer.setCollision([1, 2, 3]);
       }
     }
 
@@ -136,9 +136,19 @@ export default class GameScene extends Phaser.Scene {
     // Espalha de 5 a 10 slimes pelo mapa
     const numSlimes = Phaser.Math.Between(5, 10);
     for (let i = 0; i < numSlimes; i++) {
-        // Posição na "Floresta" (lado direito do mapa, x > 650)
-        const x = Phaser.Math.Between(700, 1500);
-        const y = Phaser.Math.Between(100, 800);
+        let validPos = false;
+        let x = 0;
+        let y = 0;
+        while(!validPos) {
+            x = Phaser.Math.Between(100, 1500);
+            y = Phaser.Math.Between(100, 800);
+            const tile = worldLayer?.getTileAtWorldXY(x, y);
+            // Anda apenas no tile 0 (grama)
+            if (!tile || tile.index === 0) {
+                validPos = true;
+            }
+        }
+        
         const slime = this.slimes.create(x, y, 'enemy_slime') as Phaser.Physics.Arcade.Image;
         slime.setData('level', 1);
         slime.setData('name', 'slime');

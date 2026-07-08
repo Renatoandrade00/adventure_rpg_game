@@ -22,9 +22,9 @@ export default class MapEastScene extends Phaser.Scene {
       const row = [];
       for (let x = 0; x < 50; x++) {
         if (y === 0 || y === 29 || x === 49) {
-          row.push(1); // Bordas em cima, baixo e direita
+          row.push(2); // Árvores nas bordas
         } else if (Math.random() < 0.15) {
-          row.push(1); // Mais pedras/árvores na floresta
+          row.push(2); // Árvores espalhadas
         } else {
           row.push(0); // Grama
         }
@@ -39,7 +39,7 @@ export default class MapEastScene extends Phaser.Scene {
     if (tileset) {
       worldLayer = map.createLayer(0, tileset, 0, 0);
       if (worldLayer) {
-        worldLayer.setCollision(1);
+        worldLayer.setCollision([1, 2, 3]);
         worldLayer.setTint(0x99aa99); // Deixa a cor um pouco mais escura (Floresta profunda)
       }
     }
@@ -133,14 +133,24 @@ export default class MapEastScene extends Phaser.Scene {
     ];
 
     for (let i = 0; i < numEnemies; i++) {
-        const x = Phaser.Math.Between(100, 1500);
-        const y = Phaser.Math.Between(100, 800);
+        let validPos = false;
+        let x = 0;
+        let y = 0;
+        while(!validPos) {
+            x = Phaser.Math.Between(100, 1500);
+            y = Phaser.Math.Between(100, 800);
+            const tile = worldLayer?.getTileAtWorldXY(x, y);
+            // Anda apenas no tile 0 (grama)
+            if (!tile || tile.index === 0) {
+                validPos = true;
+            }
+        }
         
-        const typeInfo = Phaser.Math.RND.pick(enemyTypes);
+        const enemyConfig = Phaser.Math.RND.pick(enemyTypes);
         
-        const enemy = this.enemies.create(x, y, typeInfo.key) as Phaser.Physics.Arcade.Image;
-        enemy.setData('level', typeInfo.level);
-        enemy.setData('name', typeInfo.key.replace('enemy_', ''));
+        const enemy = this.enemies.create(x, y, enemyConfig.key) as Phaser.Physics.Arcade.Image;
+        enemy.setData('level', enemyConfig.level);
+        enemy.setData('name', enemyConfig.key.replace('enemy_', ''));
 
         enemy.setDisplaySize(48, 48);
         enemy.setCollideWorldBounds(true);

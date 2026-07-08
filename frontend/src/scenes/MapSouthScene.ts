@@ -22,11 +22,11 @@ export default class MapSouthScene extends Phaser.Scene {
       const row = [];
       for (let x = 0; x < 50; x++) {
         if (y === 0 || y === 29 || x === 0 || x === 49) {
-          row.push(1); // Bordas em tudo
+          row.push(3); // Parede da caverna
         } else if (Math.random() < 0.2) {
-          row.push(1); // Obstáculos (estalagmites)
+          row.push(3); // Pedras (obstáculos)
         } else {
-          row.push(0); // Chão da caverna
+          row.push(4); // Chão de caverna
         }
       }
       level.push(row);
@@ -39,7 +39,7 @@ export default class MapSouthScene extends Phaser.Scene {
     if (tileset) {
       worldLayer = map.createLayer(0, tileset, 0, 0);
       if (worldLayer) {
-        worldLayer.setCollision(1);
+        worldLayer.setCollision([1, 2, 3]);
         worldLayer.setTint(0x555555); // Escurece muito para parecer caverna
       }
     }
@@ -108,8 +108,18 @@ export default class MapSouthScene extends Phaser.Scene {
     ];
 
     for (let i = 0; i < numEnemies; i++) {
-        const x = Phaser.Math.Between(100, 1500);
-        const y = Phaser.Math.Between(100, 800);
+        let validPos = false;
+        let x = 0;
+        let y = 0;
+        while(!validPos) {
+            x = Phaser.Math.Between(100, 1500);
+            y = Phaser.Math.Between(100, 800);
+            const tile = worldLayer?.getTileAtWorldXY(x, y);
+            // Anda apenas no tile 4 (chão de caverna)
+            if (!tile || tile.index === 4) {
+                validPos = true;
+            }
+        }
         
         const typeInfo = Phaser.Math.RND.pick(enemyTypes);
         

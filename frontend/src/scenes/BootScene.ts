@@ -22,7 +22,30 @@ export default class BootScene extends Phaser.Scene {
     graphics.lineStyle(2, 0x424242, 1);
     graphics.strokeRect(32, 0, 32, 32);
     
-    graphics.generateTexture('tiles', 64, 32);
+    // Tile 2: Árvore (Folhas verdes escuras e tronco marrom)
+    graphics.fillStyle(0x4CAF50, 1);
+    graphics.fillRect(64, 0, 32, 32); // Fundo de grama
+    graphics.fillStyle(0x5D4037, 1); // Tronco
+    graphics.fillRect(64 + 12, 20, 8, 12);
+    graphics.fillStyle(0x1B5E20, 1); // Folhas
+    graphics.fillTriangle(64 + 16, 2, 64 + 4, 22, 64 + 28, 22);
+    
+    // Tile 3: Pedra / Parede de Caverna (Cinza escuro, formato irregular)
+    graphics.fillStyle(0x3E2723, 1); // Fundo marrom escuro (chão de caverna)
+    graphics.fillRect(96, 0, 32, 32);
+    graphics.fillStyle(0x616161, 1); // Pedra
+    graphics.fillCircle(96 + 16, 16, 12);
+    graphics.fillCircle(96 + 10, 20, 8);
+    graphics.fillCircle(96 + 22, 22, 6);
+
+    // Tile 4: Chão de Caverna
+    graphics.fillStyle(0x3E2723, 1);
+    graphics.fillRect(128, 0, 32, 32);
+    graphics.fillStyle(0x271613, 1); // Detalhes
+    graphics.fillRect(128 + 6, 6, 4, 4);
+    graphics.fillRect(128 + 22, 18, 4, 4);
+    
+    graphics.generateTexture('tiles', 160, 32);
     graphics.destroy();
 
     // ==========================================
