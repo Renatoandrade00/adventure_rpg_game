@@ -74,12 +74,12 @@ export default class MapEastScene extends Phaser.Scene {
     // Portal para voltar ao mapa inicial (Esquerda)
     const portalWest = this.add.zone(32, 15 * 32, 64, 30 * 32);
     this.physics.add.existing(portalWest, true);
-    this.physics.add.overlap(this.player, portalWest, () => this.changeMap('GameScene', 48 * 32, this.player.y), undefined, this);
+    this.physics.add.overlap(this.player, portalWest, () => this.changeMap('GameScene', 1500, this.player.y), undefined, this);
 
     // Portal para ir pro Sul a partir daqui
     const portalSouth = this.add.zone(25 * 32, 30 * 32 - 32, 50 * 32, 64);
     this.physics.add.existing(portalSouth, true);
-    this.physics.add.overlap(this.player, portalSouth, () => this.changeMap('MapSouthScene', this.player.x, 64), undefined, this);
+    this.physics.add.overlap(this.player, portalSouth, () => this.changeMap('MapSouthScene', this.player.x, 100), undefined, this);
 
     this.add.text(100, 15 * 32, '<- Planícies', { fontSize: '18px', color: '#fff', backgroundColor: '#000' }).setOrigin(0.5);
     this.add.text(25 * 32, 30 * 32 - 100, 'Caverna (Perigo) V', { fontSize: '18px', color: '#ff0000', backgroundColor: '#000' }).setOrigin(0.5);
