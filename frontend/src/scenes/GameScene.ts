@@ -13,7 +13,7 @@ export default class GameScene extends Phaser.Scene {
     super('GameScene');
   }
 
-  create() {
+  create(data: { x?: number, y?: number }) {
     // Carrega dados do usuário (se não tiver, usa padrão de teste)
     this.userData = this.registry.get('user') || { username: 'Convidado', characterClass: 'Guerreiro', level: 1, exp: 0, hp: 25, maxHp: 25 };
     if(this.userData.hp === undefined) {
@@ -52,7 +52,12 @@ export default class GameScene extends Phaser.Scene {
 
     // 2. Criação do Jogador
     const textureName = `class_${this.userData.characterClass}`;
-    this.player = this.physics.add.image(160, 160, textureName);
+    
+    // Se vier do portal usa data.x/data.y, senão usa padrão
+    const startX = data?.x || 160;
+    const startY = data?.y || 160;
+
+    this.player = this.physics.add.image(startX, startY, textureName);
     this.player.setDisplaySize(48, 48); // Tamanho aumentado do personagem
     this.player.setCollideWorldBounds(true);
 
@@ -78,6 +83,8 @@ export default class GameScene extends Phaser.Scene {
         const x = Phaser.Math.Between(700, 1500);
         const y = Phaser.Math.Between(100, 800);
         const slime = this.slimes.create(x, y, 'enemy_slime') as Phaser.Physics.Arcade.Image;
+        slime.setData('level', 1);
+        slime.setData('name', 'slime');
         slime.setDisplaySize(32, 32);
         slime.setCollideWorldBounds(true);
         slime.setBounce(1); // Faz o slime quicar suavemente nas paredes se ele estiver se movendo
@@ -108,6 +115,15 @@ export default class GameScene extends Phaser.Scene {
     const shopZone = this.add.zone(350, 320, 64, 32);
     this.physics.add.existing(shopZone, true);
     this.physics.add.overlap(this.player, shopZone, this.onEnterShop, undefined, this);
+
+    // Portais para outros mapas
+    const portalEast = this.add.zone(50 * 32 - 5, 15 * 32, 10, 30 * 32);
+    this.physics.add.existing(portalEast, true);
+    this.physics.add.overlap(this.player, portalEast, () => this.changeMap('MapEastScene', 32, this.player.y), undefined, this);
+
+    const portalSouth = this.add.zone(25 * 32, 30 * 32 - 5, 50 * 32, 10);
+    this.physics.add.existing(portalSouth, true);
+    this.physics.add.overlap(this.player, portalSouth, () => this.changeMap('MapSouthScene', this.player.x, 32), undefined, this);
 
     // 5. HUD
     if(this.userData.gold === undefined) this.userData.gold = 0;
@@ -152,6 +168,12 @@ export default class GameScene extends Phaser.Scene {
     });
   }
 
+  private changeMap(targetScene: string, targetX: number, targetY: number) {
+      if(this.isBattling) return;
+      this.isBattling = true; 
+      this.scene.start(targetScene, { x: targetX, y: targetY });
+  }
+
   private onMeetEnemy(_player: any, slime: any) {
     if (this.isBattling) return;
     this.isBattling = true;
@@ -161,8 +183,11 @@ export default class GameScene extends Phaser.Scene {
     this.scene.pause();
     this.scene.launch('BattleScene', { 
         user: this.userData, 
-        slime: slime,
-        bgColor: '#2E8B57' // Cor verde escura para simular a grama
+        enemy: slime,
+        bgColor: '#2E8B57', // Cor verde escura para simular a grama
+        enemyLevel: slime.getData('level'),
+        enemyName: slime.getData('name'),
+        enemyKey: slime.texture.key
     });
   }
 

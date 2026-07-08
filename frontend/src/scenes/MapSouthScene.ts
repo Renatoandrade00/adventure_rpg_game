@@ -1,0 +1,178 @@
+import * as Phaser from 'phaser';
+
+export default class MapSouthScene extends Phaser.Scene {
+  private player!: Phaser.Types.Physics.Arcade.ImageWithDynamicBody;
+  private cursors!: Phaser.Types.Input.Keyboard.CursorKeys;
+  private enemies!: Phaser.Physics.Arcade.Group;
+  private hudText!: Phaser.GameObjects.Text;
+  private userData: any;
+  private isBattling: boolean = false;
+
+  constructor() {
+    super('MapSouthScene');
+  }
+
+  create(data: { x?: number, y?: number }) {
+    this.userData = this.registry.get('user');
+
+    // 1. Criação do Mapa (Caverna Profunda - 50x30)
+    const level = [];
+    for (let y = 0; y < 30; y++) {
+      const row = [];
+      for (let x = 0; x < 50; x++) {
+        if (y === 0 || y === 29 || x === 0 || x === 49) {
+          row.push(1); // Bordas em tudo
+        } else if (Math.random() < 0.2) {
+          row.push(1); // Obstáculos (estalagmites)
+        } else {
+          row.push(0); // Chão da caverna
+        }
+      }
+      level.push(row);
+    }
+
+    const map = this.make.tilemap({ data: level, tileWidth: 32, tileHeight: 32 });
+    const tileset = map.addTilesetImage('tiles', 'tiles', 32, 32, 0, 0);
+    
+    let worldLayer: any = null;
+    if (tileset) {
+      worldLayer = map.createLayer(0, tileset, 0, 0);
+      if (worldLayer) {
+        worldLayer.setCollision(1);
+        worldLayer.setTint(0x555555); // Escurece muito para parecer caverna
+      }
+    }
+
+    // 2. Criação do Jogador
+    const textureName = `class_${this.userData.characterClass}`;
+    
+    const startX = data.x || 400; 
+    const startY = data.y || 32;
+
+    this.player = this.physics.add.image(startX, startY, textureName);
+    this.player.setDisplaySize(48, 48);
+    this.player.setCollideWorldBounds(true);
+
+    if (worldLayer) {
+      this.physics.add.collider(this.player, worldLayer);
+    }
+
+    this.physics.world.setBounds(0, 0, 50 * 32, 30 * 32);
+    this.cameras.main.setBounds(0, 0, 50 * 32, 30 * 32);
+    this.cameras.main.startFollow(this.player, true, 0.05, 0.05);
+    
+    if (this.input.keyboard) {
+        this.cursors = this.input.keyboard.createCursorKeys();
+    }
+
+    // Portais (Saídas)
+    // Voltar para cima (GameScene ou MapEastScene, vamos simplificar voltando para GameScene por enquanto, ou MapEast dependendo de onde veio.
+    // Para simplificar a lógica bidirecional sem guardar o histórico, este portal ao norte leva de volta para GameScene se x < 25*32, ou MapEastScene se x > 25*32
+    const portalNorth1 = this.add.zone(12 * 32, 5, 25 * 32, 10);
+    this.physics.add.existing(portalNorth1, true);
+    this.physics.add.overlap(this.player, portalNorth1, () => this.changeMap('GameScene', this.player.x, 29 * 32), undefined, this);
+
+    const portalNorth2 = this.add.zone(37 * 32, 5, 25 * 32, 10);
+    this.physics.add.existing(portalNorth2, true);
+    this.physics.add.overlap(this.player, portalNorth2, () => this.changeMap('MapEastScene', this.player.x, 29 * 32), undefined, this);
+
+
+    // 4. Inimigos (Nível Alto e Chefe)
+    this.enemies = this.physics.add.group();
+    
+    const numEnemies = Phaser.Math.Between(5, 10);
+    const enemyTypes = [
+        { key: 'enemy_wraith', level: 6 },
+        { key: 'enemy_golem', level: 7 },
+        { key: 'enemy_minotaur', level: 8 }
+    ];
+
+    for (let i = 0; i < numEnemies; i++) {
+        const x = Phaser.Math.Between(100, 1500);
+        const y = Phaser.Math.Between(100, 800);
+        
+        const typeInfo = Phaser.Math.RND.pick(enemyTypes);
+        
+        const enemy = this.enemies.create(x, y, typeInfo.key) as Phaser.Physics.Arcade.Image;
+        enemy.setData('level', typeInfo.level);
+        enemy.setData('name', typeInfo.key.replace('enemy_', ''));
+
+        enemy.setDisplaySize(54, 54); // Monstros maiores
+        enemy.setCollideWorldBounds(true);
+        enemy.setBounce(1); 
+        
+        if (Math.random() > 0.3) {
+            enemy.setVelocity(Phaser.Math.Between(-60, 60) || 40, Phaser.Math.Between(-60, 60) || 40);
+        }
+    }
+
+    // O Grande Dragão Chefe
+    const dragon = this.enemies.create(25 * 32, 15 * 32, 'enemy_dragon') as Phaser.Physics.Arcade.Image;
+    dragon.setData('level', 10);
+    dragon.setData('name', 'dragon');
+    dragon.setDisplaySize(128, 128);
+    dragon.setCollideWorldBounds(true);
+    dragon.setVelocity(30, 30);
+    dragon.setBounce(1);
+
+    if (worldLayer) {
+        this.physics.add.collider(this.enemies, worldLayer);
+    }
+    
+    this.physics.add.overlap(this.player, this.enemies, this.onMeetEnemy, undefined, this);
+
+    // 5. HUD
+    const hudTextString = `${this.userData.username} [${this.userData.characterClass}] - Lvl: ${this.userData.level} | Exp: ${this.userData.exp} | Ouro: ${this.userData.gold} | HP: ${this.userData.hp}/${this.userData.maxHp}`;
+    this.hudText = this.add.text(10, 10, hudTextString, {
+        fontSize: '16px', fontFamily: 'Courier New', color: '#ffffff', backgroundColor: 'rgba(0,0,0,0.7)', padding: { x: 8, y: 8 }
+    });
+    this.hudText.setScrollFactor(0);
+
+    // 6. Retorno da Batalha
+    this.events.on('resume', (_scene: any, data: any) => {
+        if (data && data.result === 'win' && data.enemy) {
+            data.enemy.destroy();
+        }
+        this.userData = this.registry.get('user');
+        this.hudText.setText(`${this.userData.username} [${this.userData.characterClass}] - Lvl: ${this.userData.level} | Exp: ${this.userData.exp} | Ouro: ${this.userData.gold} | HP: ${this.userData.hp}/${this.userData.maxHp}`);
+        
+        this.isBattling = false;
+        this.physics.resume();
+        if (this.player && this.player.body) this.player.setVelocity(0);
+    });
+  }
+
+  private changeMap(targetScene: string, targetX: number, targetY: number) {
+      if(this.isBattling) return;
+      this.isBattling = true; 
+      this.scene.start(targetScene, { x: targetX, y: targetY });
+  }
+
+  private onMeetEnemy(_player: any, enemy: any) {
+    if (this.isBattling) return;
+    this.isBattling = true;
+
+    this.physics.pause();
+    this.scene.pause();
+    this.scene.launch('BattleScene', { 
+        user: this.userData, 
+        enemy: enemy,
+        bgColor: '#1a1a1a', // Cor de caverna (quase preto)
+        enemyLevel: enemy.getData('level'),
+        enemyName: enemy.getData('name'),
+        enemyKey: enemy.texture.key
+    });
+  }
+
+  update() {
+    if (!this.cursors || !this.player || this.isBattling) return;
+
+    this.player.setVelocity(0);
+
+    if (this.cursors.left.isDown) this.player.setVelocityX(-160);
+    else if (this.cursors.right.isDown) this.player.setVelocityX(160);
+
+    if (this.cursors.up.isDown) this.player.setVelocityY(-160);
+    else if (this.cursors.down.isDown) this.player.setVelocityY(160);
+  }
+}
