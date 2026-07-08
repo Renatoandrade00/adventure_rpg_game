@@ -13,6 +13,7 @@ export default class MapEastScene extends Phaser.Scene {
   }
 
   create(data: { x?: number, y?: number }) {
+    this.isBattling = false;
     this.userData = this.registry.get('user');
 
     // 1. Criação do Mapa (Floresta Profunda - 50x30)

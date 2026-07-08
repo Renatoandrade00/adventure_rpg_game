@@ -14,6 +14,7 @@ export default class GameScene extends Phaser.Scene {
   }
 
   create(data: { x?: number, y?: number }) {
+    this.isBattling = false;
     // Carrega dados do usuário (se não tiver, usa padrão de teste)
     this.userData = this.registry.get('user') || { username: 'Convidado', characterClass: 'Guerreiro', level: 1, exp: 0, hp: 25, maxHp: 25 };
     if(this.userData.hp === undefined) {

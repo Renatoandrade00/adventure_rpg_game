@@ -13,6 +13,7 @@ export default class MapSouthScene extends Phaser.Scene {
   }
 
   create(data: { x?: number, y?: number }) {
+    this.isBattling = false;
     this.userData = this.registry.get('user');
 
     // 1. Criação do Mapa (Caverna Profunda - 50x30)
