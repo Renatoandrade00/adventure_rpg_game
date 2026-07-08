@@ -116,14 +116,18 @@ export default class GameScene extends Phaser.Scene {
     this.physics.add.existing(shopZone, true);
     this.physics.add.overlap(this.player, shopZone, this.onEnterShop, undefined, this);
 
-    // Portais para outros mapas
-    const portalEast = this.add.zone(50 * 32 - 5, 15 * 32, 10, 30 * 32);
+    // Portais para outros mapas (Aumentei o tamanho da zona de colisão para garantir o teletransporte)
+    const portalEast = this.add.zone(50 * 32 - 32, 15 * 32, 64, 30 * 32);
     this.physics.add.existing(portalEast, true);
-    this.physics.add.overlap(this.player, portalEast, () => this.changeMap('MapEastScene', 32, this.player.y), undefined, this);
+    this.physics.add.overlap(this.player, portalEast, () => this.changeMap('MapEastScene', 64, this.player.y), undefined, this);
 
-    const portalSouth = this.add.zone(25 * 32, 30 * 32 - 5, 50 * 32, 10);
+    const portalSouth = this.add.zone(25 * 32, 30 * 32 - 32, 50 * 32, 64);
     this.physics.add.existing(portalSouth, true);
-    this.physics.add.overlap(this.player, portalSouth, () => this.changeMap('MapSouthScene', this.player.x, 32), undefined, this);
+    this.physics.add.overlap(this.player, portalSouth, () => this.changeMap('MapSouthScene', this.player.x, 64), undefined, this);
+
+    // Textos no chão para guiar o jogador (já que as zonas são invisíveis)
+    this.add.text(50 * 32 - 100, 15 * 32, 'Floresta ->', { fontSize: '18px', color: '#fff', backgroundColor: '#000' }).setOrigin(0.5);
+    this.add.text(25 * 32, 30 * 32 - 100, 'Caverna (Perigo) V', { fontSize: '18px', color: '#ff0000', backgroundColor: '#000' }).setOrigin(0.5);
 
     // 5. HUD
     if(this.userData.gold === undefined) this.userData.gold = 0;

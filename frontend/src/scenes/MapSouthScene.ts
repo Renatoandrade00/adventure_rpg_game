@@ -66,15 +66,16 @@ export default class MapSouthScene extends Phaser.Scene {
     }
 
     // Portais (Saídas)
-    // Voltar para cima (GameScene ou MapEastScene, vamos simplificar voltando para GameScene por enquanto, ou MapEast dependendo de onde veio.
-    // Para simplificar a lógica bidirecional sem guardar o histórico, este portal ao norte leva de volta para GameScene se x < 25*32, ou MapEastScene se x > 25*32
-    const portalNorth1 = this.add.zone(12 * 32, 5, 25 * 32, 10);
+    const portalNorth1 = this.add.zone(12 * 32, 32, 25 * 32, 64);
     this.physics.add.existing(portalNorth1, true);
     this.physics.add.overlap(this.player, portalNorth1, () => this.changeMap('GameScene', this.player.x, 29 * 32), undefined, this);
 
-    const portalNorth2 = this.add.zone(37 * 32, 5, 25 * 32, 10);
+    const portalNorth2 = this.add.zone(37 * 32, 32, 25 * 32, 64);
     this.physics.add.existing(portalNorth2, true);
     this.physics.add.overlap(this.player, portalNorth2, () => this.changeMap('MapEastScene', this.player.x, 29 * 32), undefined, this);
+
+    this.add.text(12 * 32, 100, '^ Planícies', { fontSize: '18px', color: '#fff', backgroundColor: '#000' }).setOrigin(0.5);
+    this.add.text(37 * 32, 100, '^ Floresta', { fontSize: '18px', color: '#fff', backgroundColor: '#000' }).setOrigin(0.5);
 
 
     // 4. Inimigos (Nível Alto e Chefe)
