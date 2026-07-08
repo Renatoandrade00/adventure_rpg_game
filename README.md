@@ -1,12 +1,14 @@
 # ⚔️ Adventure RPG Game
 
-![Status](https://img.shields.io/badge/Status-Concluído-success)
+![Status](https://img.shields.io/badge/Status-Em_Desenvolvimento-yellow)
 ![Phaser](https://img.shields.io/badge/Phaser-3.80-blue)
 ![Vite](https://img.shields.io/badge/Vite-5.0-purple)
 ![Node.js](https://img.shields.io/badge/Node.js-Backend-green)
 ![MongoDB](https://img.shields.io/badge/MongoDB-Atlas-lightgreen)
 
 Bem-vindo ao **Adventure RPG**, um jogo de interpretação de papéis em 2D construído inteiramente do zero! 
+
+🚧 **Aviso:** Este jogo está atualmente **em desenvolvimento ativo**. Diversas melhorias, novos sistemas (como subida de nível e novos inimigos) e polimentos estão a caminho!
 
 Este projeto foi desenvolvido com o objetivo principal de **aprendizado pessoal** e exploração de tecnologias modernas para desenvolvimento de jogos web e integração Full-Stack (Frontend + Backend + Banco de Dados).
 
