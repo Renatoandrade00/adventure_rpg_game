@@ -102,9 +102,11 @@ export default class MapSouthScene extends Phaser.Scene {
     
     const numEnemies = Phaser.Math.Between(5, 10);
     const enemyTypes = [
-        { key: 'enemy_wraith', level: 6 },
-        { key: 'enemy_golem', level: 7 },
-        { key: 'enemy_minotaur', level: 8 }
+        { key: 'enemy_spider', level: 4 },
+        { key: 'enemy_wraith', level: 5 },
+        { key: 'enemy_golem', level: 6 },
+        { key: 'enemy_minotaur', level: 7 },
+        { key: 'enemy_dragon', level: 10 } // Chefe/Monstro mais forte!
     ];
 
     for (let i = 0; i < numEnemies; i++) {

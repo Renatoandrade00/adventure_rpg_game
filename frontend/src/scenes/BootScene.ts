@@ -143,6 +143,7 @@ export default class BootScene extends Phaser.Scene {
     this.load.image('enemy_wraith', '/assets/enemy_wraith.png');
     this.load.image('enemy_golem', '/assets/enemy_golem.png');
     this.load.image('enemy_minotaur', '/assets/enemy_minotaur.png');
+    this.load.image('enemy_dragon', '/assets/enemy_dragon.png');
     this.load.image('npc_nurse', 'assets/nurse.png');
     this.load.image('npc_merchant', 'assets/merchant.png');
     
