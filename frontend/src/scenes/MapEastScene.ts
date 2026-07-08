@@ -69,8 +69,41 @@ export default class MapEastScene extends Phaser.Scene {
     this.cameras.main.startFollow(this.player, true, 0.05, 0.05);
     
     if (this.input.keyboard) {
-        this.cursors = this.input.keyboard.createCursorKeys();
+      this.cursors = this.input.keyboard.createCursorKeys();
+
+      // Abre o Menu In-Game
+      this.input.keyboard.on('keydown-ENTER', () => {
+          if (this.isBattling) return;
+          this.physics.pause();
+          this.scene.pause();
+          this.scene.launch('MenuScene', { 
+              user: this.userData, 
+              currentMapScene: 'MapEastScene', 
+              x: this.player.x, 
+              y: this.player.y 
+          });
+      });
     }
+
+    // Tratamento ao voltar da batalha ou menu
+    this.events.on('resume', (sys: any, data: any) => {
+        if (data && data.menuUpdate) {
+            this.userData = this.registry.get('user');
+            this.hudText.setText(`${this.userData.username} [${this.userData.characterClass}] - Lvl: ${this.userData.level} | Exp: ${this.userData.exp} | Ouro: ${this.userData.gold} | HP: ${this.userData.hp}/${this.userData.maxHp}`);
+            this.physics.resume();
+            return;
+        }
+
+        if (data && data.result === 'win' && data.enemy) {
+            data.enemy.destroy();
+        }
+        this.userData = this.registry.get('user');
+        this.hudText.setText(`${this.userData.username} [${this.userData.characterClass}] - Lvl: ${this.userData.level} | Exp: ${this.userData.exp} | Ouro: ${this.userData.gold} | HP: ${this.userData.hp}/${this.userData.maxHp}`);
+        
+        this.isBattling = false;
+        this.physics.resume();
+        if (this.player && this.player.body) this.player.setVelocity(0);
+    });
 
     // Portal para voltar ao mapa inicial (Esquerda)
     const portalWest = this.add.zone(32, 15 * 32, 64, 30 * 32);

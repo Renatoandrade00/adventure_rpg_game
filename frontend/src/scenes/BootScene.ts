@@ -50,6 +50,10 @@ export default class BootScene extends Phaser.Scene {
   }
 
   create() {
-    this.scene.start('GameScene');
+    const userData = this.registry.get('user');
+    const targetScene = userData?.currentScene || 'GameScene';
+    const targetX = userData?.lastX || 160;
+    const targetY = userData?.lastY || 160;
+    this.scene.start(targetScene, { x: targetX, y: targetY });
   }
 }

@@ -7,6 +7,8 @@ import ShopScene from './scenes/ShopScene';
 import MapEastScene from './scenes/MapEastScene';
 import MapSouthScene from './scenes/MapSouthScene';
 
+import MenuScene from './scenes/MenuScene';
+
 // URL do Backend (pega das variáveis de ambiente em produção, senão usa localhost)
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
 
@@ -32,7 +34,8 @@ function startGame(userData: any) {
         debug: false
       }
     },
-    scene: [BootScene, GameScene, HospitalScene, ShopScene, MapEastScene, MapSouthScene, BattleScene]
+    // MenuScene fica no final para renderizar por cima de tudo
+    scene: [BootScene, GameScene, HospitalScene, ShopScene, MapEastScene, MapSouthScene, MenuScene, BattleScene]
   };
 
   // Inicia o Jogo

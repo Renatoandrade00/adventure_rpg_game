@@ -46,9 +46,13 @@ app.post('/api/register', async (req, res) => {
       level: 1,
       exp: 0,
       gold: 0,
+      gold: 0,
       potions: 2,
       hp: 25,
-      maxHp: 25
+      maxHp: 25,
+      currentScene: 'GameScene',
+      lastX: 160,
+      lastY: 160
     });
 
     await newUser.save();
@@ -80,9 +84,13 @@ app.post('/api/login', async (req, res) => {
         level: user.level,
         exp: user.exp,
         gold: user.gold,
+        gold: user.gold,
         potions: user.potions,
         hp: user.hp,
-        maxHp: user.maxHp
+        maxHp: user.maxHp,
+        currentScene: user.currentScene || 'GameScene',
+        lastX: user.lastX || 160,
+        lastY: user.lastY || 160
       }
     });
   } catch (err) {
@@ -94,10 +102,10 @@ app.post('/api/login', async (req, res) => {
 // Endpoint de atualização (save) - Opcional, para o frontend mandar o progresso de volta pro DB
 app.post('/api/save', async (req, res) => {
     try {
-      const { username, level, exp, gold, potions, hp, maxHp } = req.body;
+      const { username, level, exp, gold, potions, hp, maxHp, currentScene, lastX, lastY } = req.body;
       const user = await User.findOneAndUpdate(
           { username }, 
-          { level, exp, gold, potions, hp, maxHp }, 
+          { level, exp, gold, potions, hp, maxHp, currentScene, lastX, lastY }, 
           { new: true }
       );
       if (!user) {

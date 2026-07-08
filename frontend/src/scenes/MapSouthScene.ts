@@ -69,6 +69,19 @@ export default class MapSouthScene extends Phaser.Scene {
     
     if (this.input.keyboard) {
         this.cursors = this.input.keyboard.createCursorKeys();
+        
+        // Abre o Menu In-Game
+        this.input.keyboard.on('keydown-ENTER', () => {
+            if (this.isBattling) return;
+            this.physics.pause();
+            this.scene.pause();
+            this.scene.launch('MenuScene', { 
+                user: this.userData, 
+                currentMapScene: 'MapSouthScene', 
+                x: this.player.x, 
+                y: this.player.y 
+            });
+        });
     }
 
     // Portais (Saídas)
@@ -145,8 +158,15 @@ export default class MapSouthScene extends Phaser.Scene {
     });
     this.hudText.setScrollFactor(0);
 
-    // 6. Retorno da Batalha
-    this.events.on('resume', (_scene: any, data: any) => {
+    // 6. Retorno da Batalha/Menu
+    this.events.on('resume', (sys: any, data: any) => {
+        if (data && data.menuUpdate) {
+            this.userData = this.registry.get('user');
+            this.hudText.setText(`${this.userData.username} [${this.userData.characterClass}] - Lvl: ${this.userData.level} | Exp: ${this.userData.exp} | Ouro: ${this.userData.gold} | HP: ${this.userData.hp}/${this.userData.maxHp}`);
+            this.physics.resume();
+            return;
+        }
+
         if (data && data.result === 'win' && data.enemy) {
             data.enemy.destroy();
         }

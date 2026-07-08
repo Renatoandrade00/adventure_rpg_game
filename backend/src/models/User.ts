@@ -10,6 +10,9 @@ export interface IUser extends Document {
   potions: number;
   hp: number;
   maxHp: number;
+  currentScene: string;
+  lastX: number;
+  lastY: number;
 }
 
 const UserSchema: Schema = new Schema({
@@ -25,7 +28,10 @@ const UserSchema: Schema = new Schema({
   gold: { type: Number, default: 0 },
   potions: { type: Number, default: 2 },
   hp: { type: Number, default: 25 },
-  maxHp: { type: Number, default: 25 }
+  maxHp: { type: Number, default: 25 },
+  currentScene: { type: String, default: 'GameScene' },
+  lastX: { type: Number, default: 160 },
+  lastY: { type: Number, default: 160 }
 });
 
 export default mongoose.model<IUser>('User', UserSchema);
