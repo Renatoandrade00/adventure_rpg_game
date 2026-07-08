@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>RPG 2D de Navegador</title>
+    <link rel="stylesheet" href="/src/style.css" />
+  </head>
+  <body>
+    <!-- Jogo Phaser Renderizado Aqui -->
+    <div id="app"></div>
+
+    <!-- UI: Overlay de Autenticação -->
+    <div id="auth-overlay">
+      <div class="auth-box">
+        <h1>RPG 2D - Login</h1>
+        
+        <!-- Formulário de Login -->
+        <form id="login-form">
+          <h2>Entrar</h2>
+          <input type="text" id="login-username" placeholder="Nome do Herói" required />
+          <input type="password" id="login-password" placeholder="Senha" required />
+          <button type="submit">Iniciar Aventura</button>
+          <p class="toggle-link" id="show-register">Não tem uma conta? Criar herói</p>
+          <p class="error-msg" id="login-error"></p>
+        </form>
+
+        <!-- Formulário de Cadastro (Oculto por padrão) -->
+        <form id="register-form" style="display: none;">
+          <h2>Criar Novo Herói</h2>
+          <input type="text" id="reg-username" placeholder="Nome do Herói" required />
+          <input type="password" id="reg-password" placeholder="Senha" required />
+          
+          <label for="reg-class">Escolha sua Classe:</label>
+          <select id="reg-class" required>
+            <option value="Guerreiro">Guerreiro</option>
+            <option value="Arqueiro">Arqueiro</option>
+            <option value="Mágico">Mágico</option>
+          </select>
+
+          <button type="submit">Criar Conta</button>
+          <p class="toggle-link" id="show-login">Já tem uma conta? Fazer login</p>
+          <p class="error-msg" id="reg-error"></p>
+        </form>
+      </div>
+    </div>
+
+    <!-- Script Principal (TypeScript) -->
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
