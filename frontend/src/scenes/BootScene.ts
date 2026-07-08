@@ -9,12 +9,16 @@ export default class BootScene extends Phaser.Scene {
     // Mantemos os blocos do mapa gerados via código por enquanto
     const graphics = this.add.graphics();
     
-    // Tile 0: Grama
+    // Tile 0: Grama (Textura melhorada)
     graphics.fillStyle(0x4CAF50, 1);
     graphics.fillRect(0, 0, 32, 32);
     graphics.fillStyle(0x388E3C, 1);
-    graphics.fillRect(4, 4, 4, 4);
-    graphics.fillRect(20, 16, 4, 4);
+    graphics.fillRect(4, 4, 2, 2);
+    graphics.fillRect(20, 16, 2, 2);
+    graphics.fillRect(10, 26, 2, 2);
+    graphics.fillStyle(0x81C784, 1);
+    graphics.fillRect(24, 8, 2, 2);
+    graphics.fillRect(8, 18, 2, 2);
     
     // Tile 1: Parede
     graphics.fillStyle(0x757575, 1);
@@ -22,13 +26,15 @@ export default class BootScene extends Phaser.Scene {
     graphics.lineStyle(2, 0x424242, 1);
     graphics.strokeRect(32, 0, 32, 32);
     
-    // Tile 2: Árvore (Folhas verdes escuras e tronco marrom)
+    // Tile 2: Árvore (Estilo mais arredondado e clássico)
     graphics.fillStyle(0x4CAF50, 1);
     graphics.fillRect(64, 0, 32, 32); // Fundo de grama
     graphics.fillStyle(0x5D4037, 1); // Tronco
-    graphics.fillRect(64 + 12, 20, 8, 12);
-    graphics.fillStyle(0x1B5E20, 1); // Folhas
-    graphics.fillTriangle(64 + 16, 2, 64 + 4, 22, 64 + 28, 22);
+    graphics.fillRect(64 + 14, 16, 4, 16);
+    graphics.fillStyle(0x1B5E20, 1); // Sombra das folhas
+    graphics.fillCircle(64 + 16, 12, 12);
+    graphics.fillStyle(0x2E7D32, 1); // Folhas claras
+    graphics.fillCircle(64 + 16, 10, 10);
     
     // Tile 3: Pedra / Parede de Caverna (Cinza escuro, formato irregular)
     graphics.fillStyle(0x3E2723, 1); // Fundo marrom escuro (chão de caverna)
@@ -82,7 +88,42 @@ export default class BootScene extends Phaser.Scene {
     graphics.fillRect(256 + 14, 18, 4, 10);
     graphics.fillRect(256 + 11, 21, 10, 4);
 
-    graphics.generateTexture('tiles', 288, 32);
+    // Tile 9: Caminho de Terra
+    graphics.fillStyle(0x8D6E63, 1); // Terra
+    graphics.fillRect(288, 0, 32, 32);
+    graphics.fillStyle(0x6D4C41, 1); // Detalhes
+    graphics.fillRect(288 + 4, 4, 4, 2);
+    graphics.fillRect(288 + 20, 12, 2, 4);
+    graphics.fillRect(288 + 10, 24, 4, 2);
+
+    // Tile 10: Água (Rio)
+    graphics.fillStyle(0x2196F3, 1); // Água azul
+    graphics.fillRect(320, 0, 32, 32);
+    graphics.fillStyle(0x64B5F6, 1); // Reflexo claro
+    graphics.fillRect(320 + 8, 8, 12, 2);
+    graphics.fillRect(320 + 4, 20, 8, 2);
+    graphics.fillRect(320 + 20, 24, 6, 2);
+
+    // Tile 11: Ponte de Madeira
+    graphics.fillStyle(0x795548, 1); // Fundo madeira
+    graphics.fillRect(352, 0, 32, 32);
+    graphics.lineStyle(2, 0x3E2723, 1); // Vãos
+    graphics.beginPath();
+    graphics.moveTo(352 + 8, 0); graphics.lineTo(352 + 8, 32);
+    graphics.moveTo(352 + 16, 0); graphics.lineTo(352 + 16, 32);
+    graphics.moveTo(352 + 24, 0); graphics.lineTo(352 + 24, 32);
+    graphics.strokePath();
+    graphics.fillStyle(0x000000, 0.3); // Pregos
+    graphics.fillRect(352 + 4, 2, 2, 2);
+    graphics.fillRect(352 + 12, 2, 2, 2);
+    graphics.fillRect(352 + 20, 2, 2, 2);
+    graphics.fillRect(352 + 28, 2, 2, 2);
+    graphics.fillRect(352 + 4, 28, 2, 2);
+    graphics.fillRect(352 + 12, 28, 2, 2);
+    graphics.fillRect(352 + 20, 28, 2, 2);
+    graphics.fillRect(352 + 28, 28, 2, 2);
+
+    graphics.generateTexture('tiles', 384, 32);
     graphics.destroy();
 
     // ==========================================

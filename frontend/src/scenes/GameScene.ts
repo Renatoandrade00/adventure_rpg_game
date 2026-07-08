@@ -26,14 +26,29 @@ export default class GameScene extends Phaser.Scene {
     const level = [];
     for (let y = 0; y < 30; y++) {
       const row = [];
-      for (let x = 0; x < 50; x++) { // Aumentei o mapa para 50x30
-        if (y === 0 || y === 29 || x === 0 || x === 49) {
-          row.push(1); // Bordas
-        } else if (x === 20 && y > 10 && y < 20) {
-          row.push(1); // Muro dividindo Vila e Floresta
-        } else if (Math.random() < 0.1 && x > 20) {
-          row.push(1); // Pedras apenas na Floresta
-        } else {
+      for (let x = 0; x < 50; x++) { // Mapa 50x30
+        // Rio (Cortando o mapa no eixo Y)
+        if (x >= 32 && x <= 36) {
+            // Ponte sobre o rio
+            if (y >= 14 && y <= 16) {
+                row.push(11); // Ponte (Andável)
+            } else {
+                row.push(10); // Água (Bloqueia)
+            }
+        }
+        // Caminho de Terra ligando as áreas
+        else if (y >= 14 && y <= 16 && x > 2 && x < 48) {
+            row.push(9); // Terra
+        }
+        // Bordas impenetráveis formadas por Árvores
+        else if (y === 0 || y === 29 || x === 0 || x === 49) {
+          row.push(2); // Árvores (Bloqueia)
+        }
+        // Árvores espalhadas para dar volume
+        else if (Math.random() < 0.05) {
+          row.push(2); // Árvores
+        }
+        else {
           row.push(0); // Grama
         }
       }
@@ -47,7 +62,7 @@ export default class GameScene extends Phaser.Scene {
     if (tileset) {
       worldLayer = map.createLayer(0, tileset, 0, 0);
       if (worldLayer) {
-        worldLayer.setCollision([1, 2, 3]);
+        worldLayer.setCollision([1, 2, 3, 10]); // Paredes, Árvores, Pedras e Água bloqueiam a passagem
       }
     }
 
