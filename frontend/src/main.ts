@@ -32,7 +32,7 @@ function startGame(userData: any) {
         debug: false
       }
     },
-    scene: [BootScene, GameScene, BattleScene, HospitalScene, ShopScene, MapEastScene, MapSouthScene]
+    scene: [BootScene, GameScene, HospitalScene, ShopScene, MapEastScene, MapSouthScene, BattleScene]
   };
 
   // Inicia o Jogo
