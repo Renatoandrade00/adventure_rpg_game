@@ -37,9 +37,13 @@ export default class GameScene extends Phaser.Scene {
                 row.push(10); // Água (Bloqueia)
             }
         }
-        // Caminho de Terra ligando as áreas
-        else if (y >= 14 && y <= 16 && x > 2 && x < 48) {
-            row.push(9); // Terra
+        // Caminho de Terra ligando as áreas (Oeste -> Leste)
+        else if (y >= 14 && y <= 16 && x > 2) {
+            row.push(9); // Terra (agora vai até a borda leste x=49)
+        }
+        // Caminho de Terra indo para o Sul (Caverna)
+        else if (x >= 24 && x <= 26 && y > 16) {
+            row.push(9); // Terra (vai até a borda sul y=29)
         }
         // Bordas impenetráveis formadas por Árvores
         else if (y === 0 || y === 29 || x === 0 || x === 49) {
@@ -205,18 +209,18 @@ export default class GameScene extends Phaser.Scene {
     this.physics.add.existing(shopZone, true);
     this.physics.add.overlap(this.player, shopZone, this.onEnterShop, undefined, this);
 
-    // Portais para outros mapas (Aumentei o tamanho da zona de colisão para garantir o teletransporte)
-    const portalEast = this.add.zone(50 * 32 - 32, 15 * 32, 64, 30 * 32);
+    // Portais para outros mapas (Áreas limitadas ao tamanho do caminho de terra)
+    const portalEast = this.add.zone(50 * 32 - 16, 15 * 32 + 16, 32, 3 * 32); 
     this.physics.add.existing(portalEast, true);
     this.physics.add.overlap(this.player, portalEast, () => this.changeMap('MapEastScene', 100, this.player.y), undefined, this);
 
-    const portalSouth = this.add.zone(25 * 32, 30 * 32 - 32, 50 * 32, 64);
+    const portalSouth = this.add.zone(25 * 32 + 16, 30 * 32 - 16, 3 * 32, 32);
     this.physics.add.existing(portalSouth, true);
     this.physics.add.overlap(this.player, portalSouth, () => this.changeMap('MapSouthScene', this.player.x, 100), undefined, this);
 
-    // Textos no chão para guiar o jogador (já que as zonas são invisíveis)
-    this.add.text(50 * 32 - 100, 15 * 32, 'Floresta ->', { fontSize: '18px', color: '#fff', backgroundColor: '#000' }).setOrigin(0.5);
-    this.add.text(25 * 32, 30 * 32 - 100, 'Caverna (Perigo) V', { fontSize: '18px', color: '#ff0000', backgroundColor: '#000' }).setOrigin(0.5);
+    // Textos no chão para guiar o jogador (agora mais próximos à saída real)
+    this.add.text(50 * 32 - 80, 15 * 32 - 32, 'Floresta ->', { fontSize: '18px', color: '#fff', backgroundColor: '#000' }).setOrigin(0.5);
+    this.add.text(25 * 32 + 16, 30 * 32 - 64, 'Caverna (Perigo) V', { fontSize: '18px', color: '#ff0000', backgroundColor: '#000' }).setOrigin(0.5);
 
     // 4.6. NPC de Missões (Ancião da Vila)
     this.add.image(200, 180, 'npc_merchant').setDisplaySize(48, 48); // Usando merchant provisoriamente
