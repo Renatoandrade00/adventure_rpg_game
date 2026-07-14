@@ -103,11 +103,16 @@ export default class MapSouthScene extends Phaser.Scene {
     this.physics.add.existing(portalNorth1, true);
     this.physics.add.overlap(this.player, portalNorth1, () => this.changeMap('GameScene', 25 * 32, 850), undefined, this);
 
-    const portalNorth2 = this.add.zone(37 * 32 + 16, 16, 3 * 32, 32);
-    this.physics.add.existing(portalNorth2, true);
-    this.physics.add.overlap(this.player, portalNorth2, () => this.changeMap('MapEastScene', 25 * 32, 850), undefined, this);
+    const portalNorth = this.add.zone(25 * 32 + 16, 16, 3 * 32, 32);
+    this.physics.add.existing(portalNorth, true);
+    this.physics.add.overlap(this.player, portalNorth, () => this.changeMap('GameScene', this.player.x, 30 * 32 - 64), undefined, this);
+    this.add.text(25 * 32 + 16, 64, '^ Vila', { fontSize: '18px', color: '#fff', backgroundColor: '#000' }).setOrigin(0.5);
 
-    this.add.text(12 * 32 + 16, 64, '^ Planícies', { fontSize: '18px', color: '#fff', backgroundColor: '#000' }).setOrigin(0.5);
+    // Portal (Sul - Dungeon Castelo das Trevas)
+    const portalSouth = this.add.zone(25 * 32 + 16, 30 * 32 - 16, 3 * 32, 32);
+    this.physics.add.existing(portalSouth, true);
+    this.physics.add.overlap(this.player, portalSouth, () => this.changeMap('DungeonScene', this.player.x, 64), undefined, this);
+    this.add.text(25 * 32 + 16, 30 * 32 - 64, 'V Castelo', { fontSize: '18px', color: '#ff0000', backgroundColor: '#000' }).setOrigin(0.5);
     this.add.text(37 * 32 + 16, 64, '^ Floresta', { fontSize: '18px', color: '#fff', backgroundColor: '#000' }).setOrigin(0.5);
 
 

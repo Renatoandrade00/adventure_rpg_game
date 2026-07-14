@@ -6,6 +6,9 @@ import HospitalScene from './scenes/HospitalScene';
 import ShopScene from './scenes/ShopScene';
 import MapEastScene from './scenes/MapEastScene';
 import MapSouthScene from './scenes/MapSouthScene';
+import MapWestScene from './scenes/MapWestScene';
+import MapNorthScene from './scenes/MapNorthScene';
+import DungeonScene from './scenes/DungeonScene';
 
 import MenuScene from './scenes/MenuScene';
 
@@ -34,8 +37,8 @@ function startGame(userData: any) {
         debug: false
       }
     },
-    // MenuScene fica no final para renderizar por cima de tudo
-    scene: [BootScene, GameScene, HospitalScene, ShopScene, MapEastScene, MapSouthScene, MenuScene, BattleScene]
+    // MenuScene e BattleScene ficam no final para renderizar por cima de tudo
+    scene: [BootScene, GameScene, HospitalScene, ShopScene, MapEastScene, MapSouthScene, MapWestScene, MapNorthScene, DungeonScene, MenuScene, BattleScene]
   };
 
   // Inicia o Jogo

@@ -218,16 +218,28 @@ export default class GameScene extends Phaser.Scene {
     this.physics.add.overlap(this.player, shopZone, this.onEnterShop, undefined, this);
 
     // Portais para outros mapas (Áreas limitadas ao tamanho do caminho de terra)
-    const portalEast = this.add.zone(50 * 32 - 16, 15 * 32 + 16, 32, 3 * 32); 
+    const portalEast = this.add.zone(50 * 32 - 16, 15 * 32 + 16, 32, 3 * 32);
     this.physics.add.existing(portalEast, true);
-    this.physics.add.overlap(this.player, portalEast, () => this.changeMap('MapEastScene', 100, this.player.y), undefined, this);
+    this.physics.add.overlap(this.player, portalEast, () => this.changeMap('MapEastScene', 64, this.player.y), undefined, this);
+    this.add.text(50 * 32 - 100, 15 * 32 - 32, 'Floresta ->', { fontSize: '18px', color: '#fff', backgroundColor: '#000' }).setOrigin(0.5);
 
+    // Portal (Sul)
     const portalSouth = this.add.zone(25 * 32 + 16, 30 * 32 - 16, 3 * 32, 32);
     this.physics.add.existing(portalSouth, true);
-    this.physics.add.overlap(this.player, portalSouth, () => this.changeMap('MapSouthScene', 12 * 32, 100), undefined, this);
+    this.physics.add.overlap(this.player, portalSouth, () => this.changeMap('MapSouthScene', this.player.x, 64), undefined, this);
+    this.add.text(25 * 32 + 16, 30 * 32 - 64, 'V Caverna', { fontSize: '18px', color: '#fff', backgroundColor: '#000' }).setOrigin(0.5);
 
-    // Textos no chão para guiar o jogador (agora mais próximos à saída real)
-    this.add.text(50 * 32 - 80, 15 * 32 - 32, 'Floresta ->', { fontSize: '18px', color: '#fff', backgroundColor: '#000' }).setOrigin(0.5);
+    // Portal (Oeste - Deserto)
+    const portalWest = this.add.zone(16, 15 * 32 + 16, 32, 3 * 32);
+    this.physics.add.existing(portalWest, true);
+    this.physics.add.overlap(this.player, portalWest, () => this.changeMap('MapWestScene', 50 * 32 - 64, this.player.y), undefined, this);
+    this.add.text(100, 15 * 32 - 32, '<- Deserto', { fontSize: '18px', color: '#fff', backgroundColor: '#000' }).setOrigin(0.5);
+
+    // Portal (Norte - Neve)
+    const portalNorth = this.add.zone(25 * 32 + 16, 16, 3 * 32, 32);
+    this.physics.add.existing(portalNorth, true);
+    this.physics.add.overlap(this.player, portalNorth, () => this.changeMap('MapNorthScene', this.player.x, 30 * 32 - 64), undefined, this);
+    this.add.text(25 * 32 + 16, 64, '^ Neve', { fontSize: '18px', color: '#fff', backgroundColor: '#000' }).setOrigin(0.5);
     this.add.text(25 * 32 + 16, 30 * 32 - 64, 'Caverna (Perigo) V', { fontSize: '18px', color: '#ff0000', backgroundColor: '#000' }).setOrigin(0.5);
 
     // 4.6. NPC de Missões (Ancião da Vila)

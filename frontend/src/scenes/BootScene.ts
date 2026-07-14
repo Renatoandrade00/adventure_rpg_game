@@ -144,8 +144,28 @@ export default class BootScene extends Phaser.Scene {
     this.load.image('enemy_golem', '/assets/enemy_golem.png');
     this.load.image('enemy_minotaur', '/assets/enemy_minotaur.png');
     this.load.image('enemy_dragon', '/assets/enemy_dragon.png');
+    
+    // Novos Inimigos (IA)
+    this.load.image('enemy_zombie', '/assets/enemy_zombie.png');
+    this.load.image('enemy_scorpion', '/assets/enemy_scorpion.png');
+    this.load.image('enemy_yeti', '/assets/enemy_yeti.png');
+    this.load.image('enemy_ice_troll', '/assets/enemy_ice_troll.png');
+    this.load.image('enemy_basilisk', '/assets/enemy_basilisk.png');
+    this.load.image('enemy_manticore', '/assets/enemy_manticore.png');
+    this.load.image('enemy_cyclops', '/assets/enemy_cyclops.png');
+    this.load.image('enemy_lich', '/assets/enemy_lich.png');
+    this.load.image('enemy_behemoth', '/assets/enemy_behemoth.png');
+    this.load.image('enemy_demon_king', '/assets/enemy_demon_king.png');
+
+    // NPCs Base
     this.load.image('npc_nurse', 'assets/nurse.png');
     this.load.image('npc_merchant', 'assets/merchant.png');
+
+    // Novos NPCs (IA)
+    this.load.image('npc_border_guard', 'assets/npc_border_guard.png');
+    this.load.image('npc_treasure_hunter', 'assets/npc_treasure_hunter.png');
+    this.load.image('npc_exiled_mage', 'assets/npc_exiled_mage.png');
+    this.load.image('npc_royal_knight', 'assets/npc_royal_knight.png');
     
     this.load.image('hospital_building', 'assets/hospital_building.png');
     this.load.image('shop_building', 'assets/shop_building.png');
