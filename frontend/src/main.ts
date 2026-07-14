@@ -15,6 +15,13 @@ import MenuScene from './scenes/MenuScene';
 // URL do Backend (pega das variáveis de ambiente em produção, senão usa localhost)
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
 
+// Extend window to store game instance
+declare global {
+  interface Window {
+    __PHASER_GAME__: Phaser.Game | null;
+  }
+}
+
 // Variável global para armazenar a instância do jogo
 let game: Phaser.Game | null = null;
 
@@ -41,8 +48,14 @@ function startGame(userData: any) {
     scene: [BootScene, GameScene, HospitalScene, ShopScene, MapEastScene, MapSouthScene, MapWestScene, MapNorthScene, DungeonScene, MenuScene, BattleScene]
   };
 
+  // Destrói qualquer instância anterior para evitar duplicação de Canvas (útil em HMR e double-clicks)
+  if (window.__PHASER_GAME__) {
+    window.__PHASER_GAME__.destroy(true);
+  }
+
   // Inicia o Jogo
   game = new Phaser.Game(config);
+  window.__PHASER_GAME__ = game;
 
   // Assim que o jogo iniciar, passamos os dados do usuário para o Registry (Memória Global do Jogo)
   game.registry.set('user', userData);

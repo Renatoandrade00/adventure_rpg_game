@@ -23,12 +23,12 @@ export default class MapSouthScene extends Phaser.Scene {
     for (let y = 0; y < 30; y++) {
       const row = [];
       for (let x = 0; x < 50; x++) {
-        // Caminho Norte 1 (Vila)
-        if (x >= 11 && x <= 13 && y < 4) {
+        // Caminho Norte (Vila)
+        if (x >= 24 && x <= 26 && y < 4) {
             row.push(4); // Chão de caverna para passagem
         }
-        // Caminho Norte 2 (Floresta)
-        else if (x >= 36 && x <= 38 && y < 4) {
+        // Caminho Sul (Dungeon)
+        else if (x >= 24 && x <= 26 && y > 25) {
             row.push(4); // Chão de caverna para passagem
         }
         else if (y === 0 || y === 29 || x === 0 || x === 49) {

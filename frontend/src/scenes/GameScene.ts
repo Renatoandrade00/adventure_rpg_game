@@ -42,12 +42,12 @@ export default class GameScene extends Phaser.Scene {
             }
         }
         // Caminho de Terra ligando as áreas (Oeste -> Leste)
-        else if (y >= 14 && y <= 16 && x > 2) {
-            row.push(9); // Terra (agora vai até a borda leste x=49)
+        else if (y >= 14 && y <= 16) {
+            row.push(9); // Terra (Cruza de 0 a 49)
         }
-        // Caminho de Terra indo para o Sul (Caverna)
-        else if (x >= 24 && x <= 26 && y > 16) {
-            row.push(9); // Terra (vai até a borda sul y=29)
+        // Caminho de Terra indo para o Norte e Sul
+        else if (x >= 24 && x <= 26) {
+            row.push(9); // Terra (Cruza de 0 a 29)
         }
         // Bordas impenetráveis formadas por Árvores
         else if (y === 0 || y === 29 || x === 0 || x === 49) {
