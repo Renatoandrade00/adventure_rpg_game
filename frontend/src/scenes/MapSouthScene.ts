@@ -21,7 +21,15 @@ export default class MapSouthScene extends Phaser.Scene {
     for (let y = 0; y < 30; y++) {
       const row = [];
       for (let x = 0; x < 50; x++) {
-        if (y === 0 || y === 29 || x === 0 || x === 49) {
+        // Caminho Norte 1 (Vila)
+        if (x >= 11 && x <= 13 && y < 4) {
+            row.push(4); // Chão de caverna para passagem
+        }
+        // Caminho Norte 2 (Floresta)
+        else if (x >= 36 && x <= 38 && y < 4) {
+            row.push(4); // Chão de caverna para passagem
+        }
+        else if (y === 0 || y === 29 || x === 0 || x === 49) {
           row.push(3); // Parede da caverna
         } else if (Math.random() < 0.2) {
           row.push(3); // Pedras (obstáculos)
@@ -84,17 +92,17 @@ export default class MapSouthScene extends Phaser.Scene {
         });
     }
 
-    // Portais (Saídas)
-    const portalNorth1 = this.add.zone(12 * 32, 32, 25 * 32, 64);
+    // Portais (Saídas limitadas)
+    const portalNorth1 = this.add.zone(12 * 32 + 16, 16, 3 * 32, 32);
     this.physics.add.existing(portalNorth1, true);
-    this.physics.add.overlap(this.player, portalNorth1, () => this.changeMap('GameScene', this.player.x, 850), undefined, this);
+    this.physics.add.overlap(this.player, portalNorth1, () => this.changeMap('GameScene', 25 * 32, 850), undefined, this);
 
-    const portalNorth2 = this.add.zone(37 * 32, 32, 25 * 32, 64);
+    const portalNorth2 = this.add.zone(37 * 32 + 16, 16, 3 * 32, 32);
     this.physics.add.existing(portalNorth2, true);
-    this.physics.add.overlap(this.player, portalNorth2, () => this.changeMap('MapEastScene', this.player.x, 850), undefined, this);
+    this.physics.add.overlap(this.player, portalNorth2, () => this.changeMap('MapEastScene', 25 * 32, 850), undefined, this);
 
-    this.add.text(12 * 32, 100, '^ Planícies', { fontSize: '18px', color: '#fff', backgroundColor: '#000' }).setOrigin(0.5);
-    this.add.text(37 * 32, 100, '^ Floresta', { fontSize: '18px', color: '#fff', backgroundColor: '#000' }).setOrigin(0.5);
+    this.add.text(12 * 32 + 16, 64, '^ Planícies', { fontSize: '18px', color: '#fff', backgroundColor: '#000' }).setOrigin(0.5);
+    this.add.text(37 * 32 + 16, 64, '^ Floresta', { fontSize: '18px', color: '#fff', backgroundColor: '#000' }).setOrigin(0.5);
 
 
     // 4. Inimigos (Nível Alto e Chefe)

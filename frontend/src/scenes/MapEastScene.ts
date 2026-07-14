@@ -21,7 +21,16 @@ export default class MapEastScene extends Phaser.Scene {
     for (let y = 0; y < 30; y++) {
       const row = [];
       for (let x = 0; x < 50; x++) {
-        if (y === 0 || y === 29 || x === 49) {
+        // Caminho voltando para a Vila (Oeste)
+        if (y >= 14 && y <= 16 && x < 4) {
+            row.push(9); // Terra
+        }
+        // Caminho indo para a Caverna (Sul)
+        else if (x >= 24 && x <= 26 && y > 25) {
+            row.push(9); // Terra
+        }
+        // Bordas
+        else if (y === 0 || y === 29 || x === 0 || x === 49) {
           row.push(2); // Árvores nas bordas
         } else if (Math.random() < 0.15) {
           row.push(2); // Árvores espalhadas
@@ -105,18 +114,18 @@ export default class MapEastScene extends Phaser.Scene {
         if (this.player && this.player.body) this.player.setVelocity(0);
     });
 
-    // Portal para voltar ao mapa inicial (Esquerda)
-    const portalWest = this.add.zone(32, 15 * 32, 64, 30 * 32);
+    // Portal para voltar ao mapa inicial (Esquerda - agora limitado ao caminho)
+    const portalWest = this.add.zone(16, 15 * 32 + 16, 32, 3 * 32);
     this.physics.add.existing(portalWest, true);
     this.physics.add.overlap(this.player, portalWest, () => this.changeMap('GameScene', 1500, this.player.y), undefined, this);
 
-    // Portal para ir pro Sul a partir daqui
-    const portalSouth = this.add.zone(25 * 32, 30 * 32 - 32, 50 * 32, 64);
+    // Portal para ir pro Sul a partir daqui (Limitado ao caminho)
+    const portalSouth = this.add.zone(25 * 32 + 16, 30 * 32 - 16, 3 * 32, 32);
     this.physics.add.existing(portalSouth, true);
-    this.physics.add.overlap(this.player, portalSouth, () => this.changeMap('MapSouthScene', this.player.x, 100), undefined, this);
+    this.physics.add.overlap(this.player, portalSouth, () => this.changeMap('MapSouthScene', 37 * 32, 100), undefined, this);
 
-    this.add.text(100, 15 * 32, '<- Planícies', { fontSize: '18px', color: '#fff', backgroundColor: '#000' }).setOrigin(0.5);
-    this.add.text(25 * 32, 30 * 32 - 100, 'Caverna (Perigo) V', { fontSize: '18px', color: '#ff0000', backgroundColor: '#000' }).setOrigin(0.5);
+    this.add.text(64, 15 * 32 - 32, '<- Planícies', { fontSize: '18px', color: '#fff', backgroundColor: '#000' }).setOrigin(0.5);
+    this.add.text(25 * 32 + 16, 30 * 32 - 64, 'Caverna (Perigo) V', { fontSize: '18px', color: '#ff0000', backgroundColor: '#000' }).setOrigin(0.5);
 
 
     // 4. Inimigos (Nível Médio)

@@ -216,7 +216,7 @@ export default class GameScene extends Phaser.Scene {
 
     const portalSouth = this.add.zone(25 * 32 + 16, 30 * 32 - 16, 3 * 32, 32);
     this.physics.add.existing(portalSouth, true);
-    this.physics.add.overlap(this.player, portalSouth, () => this.changeMap('MapSouthScene', this.player.x, 100), undefined, this);
+    this.physics.add.overlap(this.player, portalSouth, () => this.changeMap('MapSouthScene', 12 * 32, 100), undefined, this);
 
     // Textos no chão para guiar o jogador (agora mais próximos à saída real)
     this.add.text(50 * 32 - 80, 15 * 32 - 32, 'Floresta ->', { fontSize: '18px', color: '#fff', backgroundColor: '#000' }).setOrigin(0.5);
