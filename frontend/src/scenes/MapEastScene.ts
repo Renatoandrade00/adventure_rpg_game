@@ -1,5 +1,5 @@
 import * as Phaser from 'phaser';
-import * as EasyStar from 'easystarjs';
+import Pathfinder from '../utils/Pathfinder';
 
 export default class MapEastScene extends Phaser.Scene {
   private player!: Phaser.Types.Physics.Arcade.ImageWithDynamicBody;
@@ -8,12 +8,7 @@ export default class MapEastScene extends Phaser.Scene {
   private hudText!: Phaser.GameObjects.Text;
   private userData: any;
   private isBattling: boolean = false;
-
-  // Pathfinding
-  private easystar!: any;
-  private currentPath: {x: number, y: number}[] = [];
-  private pathTarget: Phaser.Math.Vector2 | null = null;
-  private pathIndex: number = 0;
+  private pathfinder!: Pathfinder;
 
   constructor() {
     super('MapEastScene');
@@ -60,11 +55,6 @@ export default class MapEastScene extends Phaser.Scene {
       }
     }
 
-    // Configuração do EasyStar (Pathfinding)
-    this.easystar = new EasyStar.js();
-    this.easystar.setGrid(level);
-    this.easystar.setAcceptableTiles([0, 9]); // Grama e Terra
-
 
     // 2. Criação do Jogador
     const textureName = `class_${this.userData.characterClass}`;
@@ -107,26 +97,8 @@ export default class MapEastScene extends Phaser.Scene {
       });
     }
 
-    // Clique na Tela (Pathfinding)
-    this.input.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
-        if (this.isBattling) return;
-        
-        const gridX = Math.floor(pointer.worldX / 32);
-        const gridY = Math.floor(pointer.worldY / 32);
-        const playerGridX = Math.floor(this.player.x / 32);
-        const playerGridY = Math.floor(this.player.y / 32);
-
-        if (gridX < 0 || gridX >= 50 || gridY < 0 || gridY >= 30) return;
-
-        this.easystar.findPath(playerGridX, playerGridY, gridX, gridY, (path: any) => {
-            if (path && path.length > 0) {
-                this.currentPath = path;
-                this.pathIndex = 1;
-                this.moveToNextNode();
-            }
-        });
-        this.easystar.calculate();
-    });
+    // Instancia o controlador universal de Pathfinding
+    this.pathfinder = new Pathfinder(this, this.player, level, [0, 9]);
 
     // Tratamento ao voltar da batalha ou menu
     this.events.on('resume', (_sys: any, data: any) => {
@@ -258,45 +230,8 @@ export default class MapEastScene extends Phaser.Scene {
     });
   }
 
-  private moveToNextNode() {
-      if (this.pathIndex >= this.currentPath.length) {
-          this.currentPath = [];
-          this.pathTarget = null;
-          if (this.player && this.player.body) this.player.setVelocity(0);
-          return;
-      }
-      const node = this.currentPath[this.pathIndex];
-      this.pathTarget = new Phaser.Math.Vector2(node.x * 32 + 16, node.y * 32 + 16);
-      if (this.player) {
-          this.physics.moveTo(this.player, this.pathTarget.x, this.pathTarget.y, 160);
-      }
-  }
-
   update() {
     if (!this.cursors || !this.player || this.isBattling) return;
-
-    const isKeyboardMoving = this.cursors.left.isDown || this.cursors.right.isDown || this.cursors.up.isDown || this.cursors.down.isDown;
-
-    if (isKeyboardMoving) {
-        this.currentPath = [];
-        this.pathTarget = null;
-        this.player.setVelocity(0);
-
-        if (this.cursors.left.isDown) this.player.setVelocityX(-160);
-        else if (this.cursors.right.isDown) this.player.setVelocityX(160);
-
-        if (this.cursors.up.isDown) this.player.setVelocityY(-160);
-        else if (this.cursors.down.isDown) this.player.setVelocityY(160);
-    } else {
-        if (this.currentPath.length > 0 && this.pathTarget) {
-            const distance = Phaser.Math.Distance.Between(this.player.x, this.player.y, this.pathTarget.x, this.pathTarget.y);
-            if (distance < 5) {
-                this.pathIndex++;
-                this.moveToNextNode();
-            }
-        } else {
-            this.player.setVelocity(0);
-        }
-    }
+    this.pathfinder.update(this.cursors);
   }
 }

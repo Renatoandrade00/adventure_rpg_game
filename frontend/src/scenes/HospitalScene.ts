@@ -1,4 +1,5 @@
 import * as Phaser from 'phaser';
+import Pathfinder from '../utils/Pathfinder';
 
 export default class HospitalScene extends Phaser.Scene {
   private userData: any;
@@ -7,6 +8,7 @@ export default class HospitalScene extends Phaser.Scene {
   private cursors!: Phaser.Types.Input.Keyboard.CursorKeys;
   private dialogText!: Phaser.GameObjects.Text;
   private exitZone!: Phaser.GameObjects.Zone;
+  private pathfinder!: Pathfinder;
 
   constructor() {
     super('HospitalScene');
@@ -75,6 +77,9 @@ export default class HospitalScene extends Phaser.Scene {
         this.physics.add.collider(this.player, worldLayer);
     }
 
+    // Instancia o controlador universal de Pathfinding
+    this.pathfinder = new Pathfinder(this, this.player, level, [5]);
+
     // Colisão Saída
     this.physics.add.overlap(this.player, this.exitZone, this.exitHospital, undefined, this);
   }
@@ -82,13 +87,7 @@ export default class HospitalScene extends Phaser.Scene {
   update() {
     if (!this.cursors || !this.player) return;
 
-    this.player.setVelocity(0);
-
-    if (this.cursors.left.isDown) this.player.setVelocityX(-160);
-    else if (this.cursors.right.isDown) this.player.setVelocityX(160);
-
-    if (this.cursors.up.isDown) this.player.setVelocityY(-160);
-    else if (this.cursors.down.isDown) this.player.setVelocityY(160);
+    this.pathfinder.update(this.cursors);
 
     // Distância para a enfermeira
     const dist = Phaser.Math.Distance.Between(this.player.x, this.player.y, this.npcNurse.x, this.npcNurse.y);
