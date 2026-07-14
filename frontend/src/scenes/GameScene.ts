@@ -1,4 +1,5 @@
 import * as Phaser from 'phaser';
+import * as EasyStar from 'easystarjs';
 
 export default class GameScene extends Phaser.Scene {
   private player!: Phaser.Types.Physics.Arcade.ImageWithDynamicBody;
@@ -9,6 +10,12 @@ export default class GameScene extends Phaser.Scene {
   private isBattling: boolean = false;
   private hospitalZone!: Phaser.GameObjects.Zone;
   private questDialogText!: Phaser.GameObjects.Text;
+
+  // Pathfinding
+  private easystar!: any;
+  private currentPath: {x: number, y: number}[] = [];
+  private pathTarget: Phaser.Math.Vector2 | null = null;
+  private pathIndex: number = 0;
 
   constructor() {
     super('GameScene');
@@ -71,6 +78,14 @@ export default class GameScene extends Phaser.Scene {
       }
     }
 
+    // Configuração do EasyStar (Pathfinding)
+    this.easystar = new EasyStar.js();
+    this.easystar.setGrid(level);
+    this.easystar.setAcceptableTiles([0, 9, 11]); // Grama, Terra, Ponte
+    // Impedir que ande nas diagonais esbarrando em quinas (opcional: enableDiagonals, disableCornerCutting)
+    // Para simplificar e evitar prender no cenário (já que a hitbox é menor que o tile), andaremos em 4 direções.
+
+
     // 2. Criação do Jogador
     const textureName = `class_${this.userData.characterClass}`;
     
@@ -112,6 +127,30 @@ export default class GameScene extends Phaser.Scene {
           });
       });
     }
+
+    // Clique na Tela (Pathfinding / Movimentação Mobile)
+    this.input.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
+        if (this.isBattling) return;
+        
+        // Converte as coordenadas do clique para a matriz do grid (blocos de 32x32)
+        const gridX = Math.floor(pointer.worldX / 32);
+        const gridY = Math.floor(pointer.worldY / 32);
+        const playerGridX = Math.floor(this.player.x / 32);
+        const playerGridY = Math.floor(this.player.y / 32);
+
+        // Limita o X e Y ao tamanho do mapa (50x30)
+        if (gridX < 0 || gridX >= 50 || gridY < 0 || gridY >= 30) return;
+
+        // Pede pro easystar calcular a rota assincronamente
+        this.easystar.findPath(playerGridX, playerGridY, gridX, gridY, (path: any) => {
+            if (path && path.length > 0) {
+                this.currentPath = path;
+                this.pathIndex = 1; // Ignora o tile inicial (0) onde o player já está
+                this.moveToNextNode();
+            }
+        });
+        this.easystar.calculate();
+    });
 
     // Tratamento ao voltar da batalha ou do menu
     this.events.on('resume', (_sys: any, data: any) => {
@@ -371,21 +410,54 @@ export default class GameScene extends Phaser.Scene {
       });
   }
 
+  private moveToNextNode() {
+      if (this.pathIndex >= this.currentPath.length) {
+          this.currentPath = [];
+          this.pathTarget = null;
+          if (this.player && this.player.body) this.player.setVelocity(0);
+          return;
+      }
+
+      const node = this.currentPath[this.pathIndex];
+      // Centro do tile destino
+      this.pathTarget = new Phaser.Math.Vector2(node.x * 32 + 16, node.y * 32 + 16);
+      
+      // Usa a física para mover na direção do ponto
+      if (this.player) {
+          this.physics.moveTo(this.player, this.pathTarget.x, this.pathTarget.y, 160);
+      }
+  }
+
   update() {
     if (!this.cursors || !this.player || this.isBattling) return;
 
-    this.player.setVelocity(0);
+    const isKeyboardMoving = this.cursors.left.isDown || this.cursors.right.isDown || this.cursors.up.isDown || this.cursors.down.isDown;
 
-    if (this.cursors.left.isDown) {
-      this.player.setVelocityX(-160);
-    } else if (this.cursors.right.isDown) {
-      this.player.setVelocityX(160);
-    }
+    if (isKeyboardMoving) {
+        // Se usar o teclado, cancela o caminho automático do mouse/mobile
+        this.currentPath = [];
+        this.pathTarget = null;
+        this.player.setVelocity(0);
 
-    if (this.cursors.up.isDown) {
-      this.player.setVelocityY(-160);
-    } else if (this.cursors.down.isDown) {
-      this.player.setVelocityY(160);
+        if (this.cursors.left.isDown) this.player.setVelocityX(-160);
+        else if (this.cursors.right.isDown) this.player.setVelocityX(160);
+
+        if (this.cursors.up.isDown) this.player.setVelocityY(-160);
+        else if (this.cursors.down.isDown) this.player.setVelocityY(160);
+    } else {
+        // Se tem uma rota de clique calculada e não encostou no teclado
+        if (this.currentPath.length > 0 && this.pathTarget) {
+            const distance = Phaser.Math.Distance.Between(this.player.x, this.player.y, this.pathTarget.x, this.pathTarget.y);
+            // Se chegou perto o suficiente do centro do bloco
+            if (distance < 5) {
+                // Passa para o próximo nó do caminho
+                this.pathIndex++;
+                this.moveToNextNode();
+            }
+        } else {
+            // Parado
+            this.player.setVelocity(0);
+        }
     }
   }
 }
