@@ -276,12 +276,10 @@ export default class BattleScene extends Phaser.Scene {
     }
 
     // Processamento de missões (Quests)
-    let questUpdated = false;
     if (this.userData.quests) {
         for (const quest of this.userData.quests) {
             if (quest.status === 'active' && quest.type === 'kill' && this.enemyKey === quest.target) {
                 quest.progress += 1;
-                questUpdated = true;
                 if (quest.progress >= quest.goal) {
                     quest.progress = quest.goal;
                     quest.status = 'ready'; // Pronto para entregar

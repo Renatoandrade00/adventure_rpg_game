@@ -8,7 +8,6 @@ export default class GameScene extends Phaser.Scene {
   private userData: any;
   private isBattling: boolean = false;
   private hospitalZone!: Phaser.GameObjects.Zone;
-  private npcElder!: Phaser.GameObjects.Image;
   private questDialogText!: Phaser.GameObjects.Text;
 
   constructor() {
@@ -220,7 +219,7 @@ export default class GameScene extends Phaser.Scene {
     this.add.text(25 * 32, 30 * 32 - 100, 'Caverna (Perigo) V', { fontSize: '18px', color: '#ff0000', backgroundColor: '#000' }).setOrigin(0.5);
 
     // 4.6. NPC de Missões (Ancião da Vila)
-    this.npcElder = this.add.image(200, 180, 'npc_merchant').setDisplaySize(48, 48); // Usando merchant provisoriamente
+    this.add.image(200, 180, 'npc_merchant').setDisplaySize(48, 48); // Usando merchant provisoriamente
     this.add.text(200, 140, 'Ancião (Missões)', { fontSize: '14px', color: '#000', backgroundColor: '#fff', padding: {x: 2, y: 2} }).setOrigin(0.5);
     
     this.questDialogText = this.add.text(this.cameras.main.centerX, this.cameras.main.height - 50, '', { 
