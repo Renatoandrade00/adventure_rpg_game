@@ -99,8 +99,23 @@ export default class HospitalScene extends Phaser.Scene {
 
   private healPlayer() {
     this.userData.hp = this.userData.maxHp;
+
+    // Restaura PP
+    if (this.userData.skillsPP) {
+        const maxPPMap: Record<string, number> = { 
+            "Golpe Rápido": 40, "Corte Profundo": 25, "Investida": 15, "Lâmina Furiosa": 5, 
+            "Tiro Rápido": 40, "Flecha Venenosa": 25, "Chuva de Prata": 15, "Tiro Certeiro": 5, 
+            "Raio Mágico": 40, "Bola de Fogo": 25, "Nevasca": 15, "Explosão Arcana": 5 
+        };
+        for (const skillName in this.userData.skillsPP) {
+            if (maxPPMap[skillName] !== undefined) {
+                this.userData.skillsPP[skillName] = maxPPMap[skillName];
+            }
+        }
+    }
+
     this.registry.set('user', this.userData); // Atualiza memória global
-    this.dialogText.setText('Prontinho! Seu HP foi totalmente restaurado.\nVolte sempre!');
+    this.dialogText.setText('Prontinho! Seu HP e PP foram totalmente restaurados.\nVolte sempre!');
     this.dialogText.setStyle({ color: '#27ae60' });
   }
 

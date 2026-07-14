@@ -2,22 +2,22 @@ import * as Phaser from 'phaser';
 
 const SKILLS: Record<string, any[]> = {
     Guerreiro: [
-        { name: "Golpe Rápido", minLvl: 1, dmgMin: 5, dmgMax: 10 },
-        { name: "Corte Profundo", minLvl: 2, dmgMin: 8, dmgMax: 15 },
-        { name: "Investida", minLvl: 3, dmgMin: 12, dmgMax: 20 },
-        { name: "Lâmina Furiosa", minLvl: 4, dmgMin: 20, dmgMax: 30 }
+        { name: "Golpe Rápido", minLvl: 1, dmgMin: 5, dmgMax: 10, maxPP: 40 },
+        { name: "Corte Profundo", minLvl: 2, dmgMin: 8, dmgMax: 15, maxPP: 25 },
+        { name: "Investida", minLvl: 3, dmgMin: 12, dmgMax: 20, maxPP: 15 },
+        { name: "Lâmina Furiosa", minLvl: 4, dmgMin: 20, dmgMax: 30, maxPP: 5 }
     ],
     Arqueiro: [
-        { name: "Tiro Rápido", minLvl: 1, dmgMin: 4, dmgMax: 12 },
-        { name: "Flecha Venenosa", minLvl: 2, dmgMin: 6, dmgMax: 18 },
-        { name: "Chuva de Prata", minLvl: 3, dmgMin: 10, dmgMax: 25 },
-        { name: "Tiro Certeiro", minLvl: 4, dmgMin: 15, dmgMax: 35 }
+        { name: "Tiro Rápido", minLvl: 1, dmgMin: 4, dmgMax: 12, maxPP: 40 },
+        { name: "Flecha Venenosa", minLvl: 2, dmgMin: 6, dmgMax: 18, maxPP: 25 },
+        { name: "Chuva de Prata", minLvl: 3, dmgMin: 10, dmgMax: 25, maxPP: 15 },
+        { name: "Tiro Certeiro", minLvl: 4, dmgMin: 15, dmgMax: 35, maxPP: 5 }
     ],
     "Mágico": [
-        { name: "Raio Mágico", minLvl: 1, dmgMin: 2, dmgMax: 15 },
-        { name: "Bola de Fogo", minLvl: 2, dmgMin: 5, dmgMax: 25 },
-        { name: "Nevasca", minLvl: 3, dmgMin: 8, dmgMax: 30 },
-        { name: "Explosão Arcana", minLvl: 4, dmgMin: 10, dmgMax: 45 }
+        { name: "Raio Mágico", minLvl: 1, dmgMin: 2, dmgMax: 15, maxPP: 40 },
+        { name: "Bola de Fogo", minLvl: 2, dmgMin: 5, dmgMax: 25, maxPP: 25 },
+        { name: "Nevasca", minLvl: 3, dmgMin: 8, dmgMax: 30, maxPP: 15 },
+        { name: "Explosão Arcana", minLvl: 4, dmgMin: 10, dmgMax: 45, maxPP: 5 }
     ]
 };
 
@@ -62,6 +62,13 @@ export default class BattleScene extends Phaser.Scene {
     if (this.userData.hp === undefined) {
         this.userData.maxHp = 20 + (this.userData.level * 5);
         this.userData.hp = this.userData.maxHp;
+    }
+
+    if (!this.userData.skillsPP) {
+        this.userData.skillsPP = {};
+    }
+    if (!this.userData.quests) {
+        this.userData.quests = [];
     }
 
     this.playerMaxHP = this.userData.maxHp;
@@ -117,22 +124,33 @@ export default class BattleScene extends Phaser.Scene {
         let btnText = `Bloqueado (Lvl ${skill.minLvl})`;
         let isLocked = true;
         let color = '#7f8c8d';
+        let currentPP = skill.maxPP;
 
         if (this.userData.level >= skill.minLvl) {
-            btnText = skill.name;
+            if (this.userData.skillsPP[skill.name] === undefined) {
+                this.userData.skillsPP[skill.name] = skill.maxPP;
+            }
+            currentPP = this.userData.skillsPP[skill.name];
+            
+            btnText = `${skill.name}\n(PP: ${currentPP}/${skill.maxPP})`;
             isLocked = false;
             color = '#3498db';
+
+            if (currentPP <= 0) {
+                isLocked = true;
+                color = '#e74c3c'; // Vermelho se sem PP
+            }
         }
 
         const btn = this.add.text(xPos, yPos, btnText, {
-            fontSize: '18px', color: '#fff', backgroundColor: color, padding: { x: 10, y: 5 }, fixedWidth: 250, align: 'center'
+            fontSize: '16px', color: '#fff', backgroundColor: color, padding: { x: 10, y: 5 }, fixedWidth: 250, align: 'center'
         }).setOrigin(0.5);
 
         if (!isLocked) {
             btn.setInteractive({ useHandCursor: true });
             btn.on('pointerover', () => btn.setStyle({ backgroundColor: '#2980b9' }));
             btn.on('pointerout', () => btn.setStyle({ backgroundColor: color }));
-            btn.on('pointerdown', () => this.playerAttack(skill));
+            btn.on('pointerdown', () => this.playerAttack(skill, i));
         }
         this.actionButtons.push(btn);
     }
@@ -193,9 +211,14 @@ export default class BattleScene extends Phaser.Scene {
     this.time.delayedCall(1500, () => this.enemyAttack(), [], this);
   }
 
-  private playerAttack(skill: any) {
+  private playerAttack(skill: any, buttonIndex: number) {
     if (!this.isPlayerTurn) return;
     this.disableButtons();
+
+    // Desconta PP
+    this.userData.skillsPP[skill.name] -= 1;
+    const btn = this.actionButtons[buttonIndex];
+    btn.setText(`${skill.name}\n(PP: ${this.userData.skillsPP[skill.name]}/${skill.maxPP})`);
 
     const damage = Phaser.Math.Between(skill.dmgMin, skill.dmgMax) + this.userData.level;
     this.enemyHP -= damage;
@@ -250,6 +273,21 @@ export default class BattleScene extends Phaser.Scene {
         this.logsText.setText(`Vitória!\nGanhou ${expGained} Exp e ${goldGained} Ouro.\nVocê subiu para o Nível ${this.userData.level}!`);
     } else {
         this.logsText.setText(`Vitória!\nGanhou ${expGained} Exp e ${goldGained} Ouro.\n(${this.userData.exp}/${expNeeded} Exp)`);
+    }
+
+    // Processamento de missões (Quests)
+    let questUpdated = false;
+    if (this.userData.quests) {
+        for (const quest of this.userData.quests) {
+            if (quest.status === 'active' && quest.type === 'kill' && this.enemyKey === quest.target) {
+                quest.progress += 1;
+                questUpdated = true;
+                if (quest.progress >= quest.goal) {
+                    quest.progress = quest.goal;
+                    quest.status = 'ready'; // Pronto para entregar
+                }
+            }
+        }
     }
 
     this.registry.set('user', this.userData);

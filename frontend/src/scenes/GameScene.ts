@@ -8,6 +8,8 @@ export default class GameScene extends Phaser.Scene {
   private userData: any;
   private isBattling: boolean = false;
   private hospitalZone!: Phaser.GameObjects.Zone;
+  private npcElder!: Phaser.GameObjects.Image;
+  private questDialogText!: Phaser.GameObjects.Text;
 
   constructor() {
     super('GameScene');
@@ -112,7 +114,7 @@ export default class GameScene extends Phaser.Scene {
     this.events.on('resume', (_sys: any, data: any) => {
         if (data && data.menuUpdate) {
             this.userData = this.registry.get('user');
-            this.hudText.setText(`${this.userData.username} [${this.userData.characterClass}] - Lvl: ${this.userData.level} | Exp: ${this.userData.exp} | Ouro: ${this.userData.gold} | HP: ${this.userData.hp}/${this.userData.maxHp}`);
+            this.hudText.setText(this.getHUDString());
             this.physics.resume();
             return;
         }
@@ -217,10 +219,23 @@ export default class GameScene extends Phaser.Scene {
     this.add.text(50 * 32 - 100, 15 * 32, 'Floresta ->', { fontSize: '18px', color: '#fff', backgroundColor: '#000' }).setOrigin(0.5);
     this.add.text(25 * 32, 30 * 32 - 100, 'Caverna (Perigo) V', { fontSize: '18px', color: '#ff0000', backgroundColor: '#000' }).setOrigin(0.5);
 
+    // 4.6. NPC de Missões (Ancião da Vila)
+    this.npcElder = this.add.image(200, 180, 'npc_merchant').setDisplaySize(48, 48); // Usando merchant provisoriamente
+    this.add.text(200, 140, 'Ancião (Missões)', { fontSize: '14px', color: '#000', backgroundColor: '#fff', padding: {x: 2, y: 2} }).setOrigin(0.5);
+    
+    this.questDialogText = this.add.text(this.cameras.main.centerX, this.cameras.main.height - 50, '', { 
+        fontSize: '16px', color: '#fff', backgroundColor: '#34495e', padding: {x: 10, y: 10}, align: 'center', fixedWidth: 400
+    }).setOrigin(0.5);
+    this.questDialogText.setVisible(false);
+    this.questDialogText.setScrollFactor(0);
+
+    const elderZone = this.add.zone(200, 180, 80, 80);
+    this.physics.add.existing(elderZone, true);
+    this.physics.add.overlap(this.player, elderZone, this.onMeetElder, undefined, this);
+
     // 5. HUD
     if(this.userData.gold === undefined) this.userData.gold = 0;
-    const hudTextString = `${this.userData.username} [${this.userData.characterClass}] - Lvl: ${this.userData.level} | Exp: ${this.userData.exp} | Ouro: ${this.userData.gold} | HP: ${this.userData.hp}/${this.userData.maxHp}`;
-    this.hudText = this.add.text(10, 10, hudTextString, {
+    this.hudText = this.add.text(10, 10, this.getHUDString(), {
         fontSize: '16px',
         fontFamily: 'Courier New',
         color: '#ffffff',
@@ -240,8 +255,7 @@ export default class GameScene extends Phaser.Scene {
         
         // Atualiza o HUD
         this.userData = this.registry.get('user');
-        const updatedText = `${this.userData.username} [${this.userData.characterClass}] - Lvl: ${this.userData.level} | Exp: ${this.userData.exp} | Ouro: ${this.userData.gold} | HP: ${this.userData.hp}/${this.userData.maxHp}`;
-        this.hudText.setText(updatedText);
+        this.hudText.setText(this.getHUDString());
 
         // Empurra o jogador para baixo
         if (data && data.from === 'hospital') {
@@ -304,6 +318,54 @@ export default class GameScene extends Phaser.Scene {
     this.scene.launch('ShopScene', { 
         user: this.userData 
     });
+  }
+
+  private getHUDString(): string {
+      let questStr = '';
+      if (this.userData.quests && this.userData.quests.length > 0) {
+          const activeQuest = this.userData.quests.find((q: any) => q.status === 'active' || q.status === 'ready');
+          if (activeQuest) {
+              questStr = ` | Missão: ${activeQuest.title} (${activeQuest.progress}/${activeQuest.goal})`;
+              if (activeQuest.status === 'ready') questStr += ' [PRONTA]';
+          }
+      }
+      return `${this.userData.username} [${this.userData.characterClass}] - Lvl: ${this.userData.level} | Exp: ${this.userData.exp} | Ouro: ${this.userData.gold} | HP: ${this.userData.hp}/${this.userData.maxHp}${questStr}`;
+  }
+
+  private onMeetElder() {
+      if (!this.userData.quests) this.userData.quests = [];
+      let activeQuest = this.userData.quests.find((q: any) => q.status === 'active' || q.status === 'ready');
+
+      if (Phaser.Input.Keyboard.JustDown(this.cursors.space)) {
+          if (!activeQuest) {
+              // Dá a primeira missão
+              activeQuest = { 
+                  id: 1, type: 'kill', target: 'enemy_slime', 
+                  goal: 3, progress: 0, status: 'active', 
+                  title: 'Matar Slimes' 
+              };
+              this.userData.quests.push(activeQuest);
+              this.registry.set('user', this.userData);
+              this.showDialog('Olá, aventureiro!\nA floresta está perigosa. Derrote 3 Slimes para mim e lhe darei ouro!');
+          } else if (activeQuest.status === 'active') {
+              this.showDialog(`Você já tem uma missão.\nVolte quando tiver derrotado ${activeQuest.goal} Slimes.`);
+          } else if (activeQuest.status === 'ready') {
+              activeQuest.status = 'completed';
+              this.userData.gold += 50;
+              this.userData.exp += 20;
+              this.registry.set('user', this.userData);
+              this.showDialog('Muito obrigado! Aqui estão 50 de Ouro e 20 de Exp.');
+          }
+          this.hudText.setText(this.getHUDString());
+      }
+  }
+
+  private showDialog(text: string) {
+      this.questDialogText.setText(text);
+      this.questDialogText.setVisible(true);
+      this.time.delayedCall(3000, () => {
+          this.questDialogText.setVisible(false);
+      });
   }
 
   update() {

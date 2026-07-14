@@ -13,6 +13,8 @@ export interface IUser extends Document {
   currentScene: string;
   lastX: number;
   lastY: number;
+  skillsPP: Record<string, number>;
+  quests: any[];
 }
 
 const UserSchema: Schema = new Schema({
@@ -31,7 +33,9 @@ const UserSchema: Schema = new Schema({
   maxHp: { type: Number, default: 25 },
   currentScene: { type: String, default: 'GameScene' },
   lastX: { type: Number, default: 160 },
-  lastY: { type: Number, default: 160 }
+  lastY: { type: Number, default: 160 },
+  skillsPP: { type: Object, default: {} },
+  quests: { type: Array, default: [] }
 });
 
 export default mongoose.model<IUser>('User', UserSchema);
